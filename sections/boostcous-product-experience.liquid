@@ -1,0 +1,680 @@
+{% comment %}
+  Boostcous full product experience — native rebuild of the Replo homepage
+  buy-box column, for A/B testing the Subscribe & Save toggle buy box against
+  the current (Replo) experience.
+
+  Renders, top to bottom (single column on mobile, media-left / info-right on
+  desktop): rating, heading, subheading, image gallery + thumbnails, View
+  Nutrition Label (opens a modal), trust badges, Why/Ingredients/Directions/
+  Benefits accordions, the wired Subscribe & Save toggle buy box, and the
+  benefits icon list.
+
+  Works on ANY template (incl. the homepage) via the "Product" setting — the
+  gallery, variants, pricing and selling plans all read from that product.
+  Add to cart posts through the theme's <product-form> (product-form.js).
+
+  Blocks: trust, accordion, benefit (all reorderable) + perk / stat for the buy
+  box. All copy/imagery is merchant-editable — no hardcoded translation keys.
+{% endcomment %}
+
+{%- assign prod = section.settings.product -%}
+
+{% style %}
+  .bx-{{ section.id }} {
+    --bc-blue: {{ section.settings.color_primary }};
+    --bc-blue-dark: {{ section.settings.color_primary | color_darken: 8 }};
+    --bc-orange: {{ section.settings.color_accent }};
+    --bc-navy: {{ section.settings.color_primary | color_darken: 18 }};
+    --bc-sky-tint: {{ section.settings.color_badge_bg }};
+    --bc-card: {{ section.settings.color_card_bg }};
+    --bc-ink: {{ section.settings.color_primary }};
+    --bc-grey: #8798B5;
+    --bc-border: {{ section.settings.color_primary | color_modify: 'alpha', 0.25 }};
+    --bx-media-bg: {{ section.settings.gallery_bg }};
+  }
+{% endstyle %}
+
+{% stylesheet %}
+  .bx {
+    font-family: "Anek Tamil", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--bc-ink);
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+    box-sizing: border-box;
+  }
+  .bx * { box-sizing: border-box; }
+
+  .bx__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: "head" "media" "info";
+    gap: 20px 40px;
+  }
+
+  .bx__head { grid-area: head; text-align: center; }
+  .bx__media { grid-area: media; }
+  .bx__info { grid-area: info; }
+
+  /* ---- Head: rating / heading / subhead ---- */
+  .bx__rating { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .bx__stars { display: inline-flex; gap: 3px; color: var(--bc-blue); }
+  .bx__rating-count { font-size: 15px; font-weight: 600; color: var(--bc-ink); }
+  .bx__heading { font-size: clamp(30px, 7vw, 44px); line-height: 1.05; font-weight: 800; color: var(--bc-blue); margin: 12px 0 0; }
+  .bx__subhead { font-size: 19px; font-weight: 700; color: #1A1A1A; margin: 12px 0 0; }
+  .bx__info { min-width: 0; }
+
+  /* ---- Gallery ---- */
+  .bx__gallery-main {
+    background: var(--bx-media-bg);
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bx__gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bx__thumbs { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+  .bx__thumb {
+    width: 84px; height: 84px; padding: 0; border-radius: 12px; overflow: hidden;
+    background: var(--bx-media-bg); border: 2px solid transparent; cursor: pointer;
+  }
+  .bx__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bx__thumb.is-active { border-color: var(--bc-blue); }
+  .bx__thumb:focus-visible { outline: 2px solid var(--bc-blue); outline-offset: 2px; }
+
+  .bx__nutrition {
+    margin-top: 16px; width: 100%; padding: 18px; border: none; border-radius: 14px;
+    background: var(--bc-sky-tint); color: var(--bc-blue);
+    font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
+    transition: filter .15s ease;
+  }
+  .bx__nutrition:hover { filter: brightness(0.97); }
+  .bx__nutrition:focus-visible { outline: 2px solid var(--bc-blue); outline-offset: 2px; }
+
+  /* ---- Nutrition modal ---- */
+  .bx__modal { position: fixed; inset: 0; z-index: 9999; display: none; }
+  .bx__modal.is-open { display: block; }
+  .bx__modal-backdrop { position: absolute; inset: 0; background: rgba(20, 51, 95, .6); }
+  .bx__modal-body {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(92vw, 620px); max-height: 90vh; background: #fff; border-radius: 16px;
+    overflow: auto; padding: 16px;
+  }
+  .bx__modal-body img { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .bx__modal-close {
+    position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border: none;
+    border-radius: 50%; background: var(--bc-blue); color: #fff; font-size: 22px; line-height: 1;
+    cursor: pointer;
+  }
+
+  /* ---- Trust badges ---- */
+  .bx__trust { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+  .bx__trust-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--bc-ink); }
+  .bx__trust-item img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+
+  /* ---- Accordions ---- */
+  .bx__acc { border-top: 1px solid rgba(20,51,95,.18); }
+  .bx__acc:last-of-type { border-bottom: 1px solid rgba(20,51,95,.18); }
+  .bx__acc summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 2px; font-size: 18px; font-weight: 700; color: #16321F;
+  }
+  .bx__acc summary::-webkit-details-marker { display: none; }
+  .bx__acc-icon { position: relative; width: 26px; height: 26px; border: 2px solid #16321F; border-radius: 50%; flex-shrink: 0; }
+  .bx__acc-icon::before, .bx__acc-icon::after {
+    content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #16321F; transition: opacity .2s ease;
+  }
+  .bx__acc-icon::before { width: 12px; height: 2px; }
+  .bx__acc-icon::after { width: 2px; height: 12px; }
+  .bx__acc[open] .bx__acc-icon::after { opacity: 0; }
+  .bx__acc-content { padding: 0 2px 18px; font-size: 15px; font-weight: 500; line-height: 1.55; color: #333; }
+  .bx__acc-content p { margin: 0 0 10px; }
+  .bx__acc-content :last-child { margin-bottom: 0; }
+
+  /* ---- Benefits list ---- */
+  .bx__benefits { margin-top: 30px; display: flex; flex-direction: column; gap: 22px; }
+  .bx__benefit { display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: start; }
+  .bx__benefit > div { min-width: 0; }
+  .bx__benefit-text { overflow-wrap: anywhere; }
+  .bx__benefit-icon {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--bc-blue);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .bx__benefit-icon img { width: 100%; height: 100%; object-fit: contain; }
+  .bx__benefit-title { font-size: 19px; font-weight: 700; color: var(--bc-blue); margin: 4px 0 4px; }
+  .bx__benefit-text { font-size: 15px; font-weight: 500; line-height: 1.5; color: #1A1A1A; }
+  .bx__benefit-text b { font-weight: 700; }
+
+  /* ================= Buy box (shared component) ================= */
+  .bc-buybox {
+    color: var(--bc-ink);
+    width: 100%;
+    background: var(--bc-card);
+    border: 1.5px solid var(--bc-blue);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .bc-buybox__banner {
+    background: var(--bc-orange); color: var(--bc-navy); text-align: center;
+    font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 12px;
+  }
+  .bc-buybox__inner { padding: 20px 22px 22px; margin: 0; border: 0; }
+  .bc-buybox__header {
+    display: grid; grid-template-columns: auto 1fr;
+    grid-template-areas: "toggle title" "badge badge" "price price";
+    align-items: center; column-gap: 12px; row-gap: 10px; justify-items: start;
+  }
+  .bc-buybox__toggle-wrap { grid-area: toggle; }
+  .bc-buybox__title { grid-area: title; font-size: 20px; font-weight: 700; }
+  .bc-buybox__badge { grid-area: badge; justify-self: start; }
+  .bc-buybox__price { grid-area: price; justify-self: start; display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+  .bc-buybox__toggle { position: relative; width: 56px; height: 32px; display: block; cursor: pointer; }
+  .bc-buybox__toggle input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 1; margin: 0; }
+  .bc-buybox__toggle-track { position: absolute; inset: 0; background: #CBD8E8; border-radius: 999px; transition: background .2s ease; }
+  .bc-buybox__toggle input:checked + .bc-buybox__toggle-track { background: var(--bc-blue); }
+  .bc-buybox__toggle input:focus-visible + .bc-buybox__toggle-track { outline: 2px solid var(--bc-blue); outline-offset: 2px; }
+  .bc-buybox__toggle-thumb { position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; background: #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(20,51,95,.3); transition: transform .2s ease; pointer-events: none; }
+  .bc-buybox__toggle input:checked ~ .bc-buybox__toggle-thumb { transform: translateX(24px); }
+  .bc-buybox__badge {
+    background: var(--bc-sky-tint); color: var(--bc-blue); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase; padding: 4px 10px; border-radius: 40px; white-space: nowrap;
+  }
+  .bc-buybox__badge:empty { display: none; }
+  .bc-buybox__compare { color: var(--bc-grey); text-decoration: line-through; font-size: 16px; font-weight: 500; }
+  .bc-buybox__compare:empty { display: none; }
+  .bc-buybox__current { font-size: 26px; font-weight: 800; color: var(--bc-blue); }
+  .bc-buybox__quantity { margin-top: 16px; position: relative; }
+  .bc-buybox__quantity select {
+    width: 100%; appearance: none; -webkit-appearance: none; font-family: inherit; font-size: 14px; font-weight: 600;
+    color: var(--bc-blue); background: #fff; border: 1px solid var(--bc-border); border-radius: 8px; padding: 13px 44px 13px 14px; cursor: pointer;
+  }
+  .bc-buybox__quantity select:focus-visible { outline: 2px solid var(--bc-blue); outline-offset: 1px; }
+  .bc-buybox__quantity::after {
+    content: ""; position: absolute; right: 16px; top: 50%; width: 9px; height: 9px;
+    border-right: 1.5px solid var(--bc-blue); border-bottom: 1.5px solid var(--bc-blue); transform: translateY(-70%) rotate(45deg); pointer-events: none;
+  }
+  .bc-buybox__perks { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .bc-buybox__perks li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; font-weight: 500; line-height: 1.45; }
+  .bc-buybox__perks svg { flex-shrink: 0; margin-top: 2px; }
+  .bc-buybox__perks .icon-x { display: none; }
+  .bc-buybox.is-onetime .bc-buybox__perks .icon-check { display: none; }
+  .bc-buybox.is-onetime .bc-buybox__perks .icon-x { display: block; }
+  .bc-buybox.is-onetime .bc-buybox__perks li { color: var(--bc-grey); }
+  .bc-buybox__cta {
+    margin-top: 18px; width: 100%; min-height: 52px; border: none; border-radius: 100px; background: var(--bc-blue);
+    color: #fff; font-family: inherit; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer;
+    transition: background .15s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .bc-buybox__cta:hover { background: var(--bc-blue-dark); }
+  .bc-buybox__cta:focus-visible { outline: 2px solid var(--bc-navy); outline-offset: 2px; }
+  .bc-buybox__cta .loading__spinner { display: none; }
+  .bc-buybox__cta.loading .loading__spinner { display: block; }
+  .bc-buybox__cta.loading > span { visibility: hidden; }
+  .bc-buybox__cta .loading__spinner path { fill: #fff; }
+  .bc-buybox .product-form__error-message-wrapper { display: flex; gap: 8px; align-items: center; color: #d02e2e; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+  .bc-buybox__stats { margin-top: 18px; padding-top: 16px; border-top: 1.5px dashed var(--bc-border); display: flex; }
+  .bc-buybox__stat { flex: 1; text-align: center; padding: 0 8px; }
+  .bc-buybox__stat + .bc-buybox__stat { border-left: 1px solid var(--bc-border); }
+  .bc-buybox__stat-value { font-size: 18px; font-weight: 800; color: var(--bc-blue); line-height: 1.2; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .bc-buybox__stat-star { color: var(--bc-orange); }
+  .bc-buybox__stat-label { margin-top: 4px; font-size: 12px; font-weight: 500; color: var(--bc-ink); line-height: 1.35; }
+
+  /* ---- Desktop: media left, info right ---- */
+  @media (min-width: 900px) {
+    .bx__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+      grid-template-areas: "media head" "media info";
+      grid-template-rows: auto 1fr;
+      align-items: start;
+    }
+    .bx__head { text-align: left; }
+    .bx__rating { justify-content: flex-start; }
+    .bx__media { position: sticky; top: 20px; }
+    .bx__heading { font-size: 44px; }
+  }
+{% endstylesheet %}
+
+{%- if prod == blank -%}
+  <div class="bx bx-{{ section.id }}">
+    <p>Select a product in the theme editor to render the Boostcous buy-box experience.</p>
+  </div>
+{%- else -%}
+
+  {%- liquid
+    assign plan_keyword = section.settings.subscription_plan_match | downcase | strip
+    assign target_group = null
+    for group in prod.selling_plan_groups
+      assign gname = group.name | downcase
+      if gname contains plan_keyword
+        assign target_group = group
+        break
+      endif
+    endfor
+    if target_group == null
+      assign target_group = prod.selling_plan_groups.first
+    endif
+    assign target_plan = null
+    if target_group
+      assign target_plan = target_group.selling_plans.first
+    endif
+
+    assign default_variant = prod.selected_or_first_available_variant
+    assign default_sub_alloc = null
+    if target_plan and default_variant
+      for a in default_variant.selling_plan_allocations
+        if a.selling_plan.id == target_plan.id
+          assign default_sub_alloc = a
+          break
+        endif
+      endfor
+    endif
+    assign default_current_cents = default_variant.price
+    assign default_pct = 0
+    if default_sub_alloc
+      assign default_current_cents = default_sub_alloc.price
+      assign default_diff = default_variant.price | minus: default_sub_alloc.price | times: 100.0
+      assign default_pct = default_diff | divided_by: default_variant.price | round
+    endif
+    assign default_badge = section.settings.subscribe_badge_label | replace: '[pct]', default_pct
+    assign form_id = 'bx-buybox-form-' | append: section.id
+  -%}
+
+  <div class="bx bx-{{ section.id }}" data-bx-root>
+    <div class="bx__grid">
+
+      <div class="bx__head">
+        <div class="bx__rating">
+          <span class="bx__stars" aria-hidden="true">
+            {% for i in (1..5) %}
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5L12.47 7.03L18.5 7.67L14 11.72L15.26 17.65L10 14.6L4.74 17.65L6 11.72L1.5 7.67L7.53 7.03L10 1.5Z"/></svg>
+            {% endfor %}
+          </span>
+          <span class="bx__rating-count">{{ section.settings.rating_text }}</span>
+        </div>
+        <h2 class="bx__heading">{{ section.settings.heading }}</h2>
+        <p class="bx__subhead">{{ section.settings.subheading }}</p>
+      </div>
+
+      <div class="bx__media">
+        {%- assign gallery_images = prod.images -%}
+        <div class="bx__gallery-main">
+          {%- assign first_image = gallery_images | first -%}
+          <img data-bx-main src="{{ first_image | image_url: width: 1000 }}" alt="{{ first_image.alt | escape }}" width="1000" height="1000" loading="lazy">
+        </div>
+        {%- if gallery_images.size > 1 -%}
+          <div class="bx__thumbs">
+            {% for image in gallery_images %}
+              <button type="button" class="bx__thumb {% if forloop.first %}is-active{% endif %}" data-bx-thumb data-full="{{ image | image_url: width: 1000 }}" aria-label="View image {{ forloop.index }}">
+                <img src="{{ image | image_url: width: 200 }}" alt="{{ image.alt | escape }}" width="200" height="200" loading="lazy">
+              </button>
+            {% endfor %}
+          </div>
+        {%- endif -%}
+        {%- if section.settings.nutrition_image_url != blank -%}
+          <button type="button" class="bx__nutrition" data-bx-nutrition-open>{{ section.settings.nutrition_button_text }}</button>
+        {%- endif -%}
+      </div>
+
+      <div class="bx__info">
+
+        {%- assign trust_blocks = section.blocks | where: 'type', 'trust' -%}
+        {%- if trust_blocks.size > 0 -%}
+          <div class="bx__trust">
+            {% for block in trust_blocks %}
+              <div class="bx__trust-item" {{ block.shopify_attributes }}>
+                {% if block.settings.icon_url != blank %}<img src="{{ block.settings.icon_url }}" alt="" width="22" height="22" loading="lazy">{% endif %}
+                <span>{{ block.settings.text }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {%- endif -%}
+
+        {% for block in section.blocks %}
+          {% if block.type == 'accordion' %}
+            <details class="bx__acc" {{ block.shopify_attributes }}>
+              <summary>
+                <span>{{ block.settings.heading }}</span>
+                <span class="bx__acc-icon" aria-hidden="true"></span>
+              </summary>
+              <div class="bx__acc-content">{{ block.settings.content }}</div>
+            </details>
+          {% endif %}
+        {% endfor %}
+
+        {% comment %} ---------- Buy box ---------- {% endcomment %}
+        <div class="bc-buybox bx-buybox" data-bc-buybox>
+          {% if section.settings.show_banner %}
+            <div class="bc-buybox__banner">{{ section.settings.banner_text }}</div>
+          {% endif %}
+          <product-form class="bc-buybox__product-form" data-section-id="{{ section.id }}">
+            <div class="product-form__error-message-wrapper" role="alert" hidden>
+              <span class="product-form__error-message"></span>
+            </div>
+            {%- form 'product', prod, id: form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+              <input type="hidden" name="id" value="{{ default_variant.id }}" class="product-variant-id" data-variant-id>
+              <input type="hidden" name="selling_plan" value="{{ target_plan.id }}" data-selling-plan-input {% unless target_plan %}disabled{% endunless %}>
+              <input type="hidden" name="quantity" value="1">
+
+              <div class="bc-buybox__inner">
+                <div class="bc-buybox__header">
+                  <label class="bc-buybox__toggle-wrap bc-buybox__toggle" aria-label="Subscribe and save">
+                    <input type="checkbox" data-sub-toggle checked>
+                    <span class="bc-buybox__toggle-track"></span>
+                    <span class="bc-buybox__toggle-thumb"></span>
+                  </label>
+                  <span class="bc-buybox__title">{{ section.settings.product_title }}</span>
+                  <span class="bc-buybox__badge" data-save-badge>{{ default_badge }}</span>
+                  <span class="bc-buybox__price">
+                    <s class="bc-buybox__compare" data-compare-price>{% if default_pct > 0 %}{{ default_variant.price | money }}{% endif %}</s>
+                    <span class="bc-buybox__current" data-current-price>{{ default_current_cents | money }}</span>
+                  </span>
+                </div>
+
+                <div class="bc-buybox__quantity" {% if prod.variants.size <= 1 %}style="display:none"{% endif %}>
+                  <select data-quantity aria-label="Pack size" data-frequency-note="{{ section.settings.frequency_note | escape }}">
+                    {% for variant in prod.variants %}
+                      {%- liquid
+                        assign v_sub_alloc = null
+                        if target_plan
+                          for a in variant.selling_plan_allocations
+                            if a.selling_plan.id == target_plan.id
+                              assign v_sub_alloc = a
+                              break
+                            endif
+                          endfor
+                        endif
+                        assign v_sub_cents = variant.price
+                        assign v_pct = 0
+                        if v_sub_alloc
+                          assign v_sub_cents = v_sub_alloc.price
+                          assign v_diff = variant.price | minus: v_sub_alloc.price | times: 100.0
+                          assign v_pct = v_diff | divided_by: variant.price | round
+                        endif
+                      -%}
+                      <option value="{{ variant.id }}"
+                        data-base-label="{{ variant.title | escape }}"
+                        data-selling-plan="{% if v_sub_alloc %}{{ target_plan.id }}{% endif %}"
+                        data-sub-current="{{ v_sub_cents | money }}"
+                        data-sub-compare="{% if v_pct > 0 %}{{ variant.price | money }}{% endif %}"
+                        data-sub-badge="{% if v_sub_alloc %}{{ section.settings.subscribe_badge_label | replace: '[pct]', v_pct }}{% endif %}"
+                        data-onetime-current="{{ variant.price | money }}"
+                        data-onetime-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+                        data-onetime-badge="{{ section.settings.onetime_badge }}"
+                        {% if variant.id == default_variant.id %}selected{% endif %}
+                        {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <ul class="bc-buybox__perks">
+                  {% for block in section.blocks %}
+                    {% if block.type == 'perk' %}
+                      <li {{ block.shopify_attributes }}>
+                        <svg class="icon-check" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8L6 11.5L12.5 4" stroke="{{ section.settings.color_primary }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg class="icon-x" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M3.5 3.5L11.5 11.5M11.5 3.5L3.5 11.5" stroke="#8798B5" stroke-width="2" stroke-linecap="round"/></svg>
+                        {{ block.settings.text }}
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+
+                <button type="submit" name="add" class="bc-buybox__cta" data-add-to-cart>
+                  <span data-cta-text>{{ section.settings.cta_label }} — {{ default_current_cents | money }}</span>
+                  {%- render 'loading-spinner' -%}
+                </button>
+
+                {% assign stat_blocks = section.blocks | where: 'type', 'stat' %}
+                {% if stat_blocks.size > 0 %}
+                  <div class="bc-buybox__stats">
+                    {% for block in stat_blocks %}
+                      <div class="bc-buybox__stat" {{ block.shopify_attributes }}>
+                        <div class="bc-buybox__stat-value">
+                          {{ block.settings.value }}
+                          {% if block.settings.show_star %}
+                            <svg class="bc-buybox__stat-star" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5L12.47 7.03L18.5 7.67L14 11.72L15.26 17.65L10 14.6L4.74 17.65L6 11.72L1.5 7.67L7.53 7.03L10 1.5Z"/></svg>
+                          {% endif %}
+                        </div>
+                        <div class="bc-buybox__stat-label">{{ block.settings.label }}</div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {%- endform -%}
+          </product-form>
+        </div>
+        {% comment %} ---------- /Buy box ---------- {% endcomment %}
+
+        {%- assign benefit_blocks = section.blocks | where: 'type', 'benefit' -%}
+        {%- if benefit_blocks.size > 0 -%}
+          <div class="bx__benefits">
+            {% for block in benefit_blocks %}
+              <div class="bx__benefit" {{ block.shopify_attributes }}>
+                <div class="bx__benefit-icon">
+                  {% if block.settings.icon_url != blank %}<img src="{{ block.settings.icon_url }}" alt="" width="64" height="64" loading="lazy">{% endif %}
+                </div>
+                <div>
+                  <div class="bx__benefit-title">{{ block.settings.heading }}</div>
+                  <div class="bx__benefit-text">{{ block.settings.text }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+
+    {%- if section.settings.nutrition_image_url != blank -%}
+      <div class="bx__modal" data-bx-nutrition-modal role="dialog" aria-modal="true" aria-label="Nutrition label">
+        <div class="bx__modal-backdrop" data-bx-nutrition-close></div>
+        <div class="bx__modal-body">
+          <button type="button" class="bx__modal-close" data-bx-nutrition-close aria-label="Close">&times;</button>
+          <img src="{{ section.settings.nutrition_image_url }}" alt="Nutrition label" width="820" height="820" loading="lazy">
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% javascript %}
+  (function () {
+    function initExperience(root) {
+      /* ---- Gallery ---- */
+      var main = root.querySelector('[data-bx-main]');
+      var thumbs = root.querySelectorAll('[data-bx-thumb]');
+      thumbs.forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+          if (main) main.src = thumb.dataset.full;
+          thumbs.forEach(function (t) { t.classList.remove('is-active'); });
+          thumb.classList.add('is-active');
+        });
+      });
+
+      /* ---- Nutrition modal ---- */
+      var modal = root.querySelector('[data-bx-nutrition-modal]');
+      var openBtn = root.querySelector('[data-bx-nutrition-open]');
+      if (modal && openBtn) {
+        var open = function () { modal.classList.add('is-open'); document.body.style.overflow = 'hidden'; };
+        var close = function () { modal.classList.remove('is-open'); document.body.style.overflow = ''; };
+        openBtn.addEventListener('click', open);
+        root.querySelectorAll('[data-bx-nutrition-close]').forEach(function (el) { el.addEventListener('click', close); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+      }
+
+      /* ---- Buy box ---- */
+      var box = root.querySelector('[data-bc-buybox]');
+      if (!box) return;
+      var qty = box.querySelector('[data-quantity]');
+      var toggle = box.querySelector('[data-sub-toggle]');
+      var variantInput = box.querySelector('[name="id"]');
+      var planInput = box.querySelector('[name="selling_plan"]');
+      var compareEl = box.querySelector('[data-compare-price]');
+      var currentEl = box.querySelector('[data-current-price]');
+      var badgeEl = box.querySelector('[data-save-badge]');
+      var ctaTextEl = box.querySelector('[data-cta-text]');
+      if (!qty || !toggle || !variantInput || !ctaTextEl) return;
+
+      var ctaLabel = ctaTextEl.textContent.split('—')[0].trim();
+      var freqNote = qty.dataset.frequencyNote || '';
+
+      function relabelOptions() {
+        for (var i = 0; i < qty.options.length; i++) {
+          var o = qty.options[i];
+          var base = o.getAttribute('data-base-label') || o.textContent;
+          o.textContent = (toggle.checked && freqNote) ? base + ' — ' + freqNote : base;
+        }
+      }
+
+      function render() {
+        var opt = qty.options[qty.selectedIndex] || qty.options[0];
+        if (!opt) return;
+        var d = opt.dataset;
+        var onetime = !toggle.checked;
+        var current = onetime ? d.onetimeCurrent : d.subCurrent;
+        var compare = onetime ? (d.onetimeCompare || '') : (d.subCompare || '');
+        var badge = onetime ? d.onetimeBadge : d.subBadge;
+
+        currentEl.textContent = current || '';
+        compareEl.textContent = (compare && compare !== current) ? compare : '';
+        badgeEl.textContent = badge || '';
+        ctaTextEl.textContent = ctaLabel + ' — ' + current;
+
+        variantInput.value = opt.value;
+        if (planInput) {
+          if (!onetime && d.sellingPlan) {
+            planInput.value = d.sellingPlan;
+            planInput.disabled = false;
+          } else {
+            planInput.value = '';
+            planInput.disabled = true;
+          }
+        }
+        box.classList.toggle('is-onetime', onetime);
+      }
+
+      qty.addEventListener('change', render);
+      toggle.addEventListener('change', function () { relabelOptions(); render(); });
+      relabelOptions();
+      render();
+    }
+
+    document.querySelectorAll('[data-bx-root]').forEach(initExperience);
+    document.addEventListener('shopify:section:load', function (event) {
+      var root = event.target.querySelector('[data-bx-root]');
+      if (root) initExperience(root);
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Boostcous Product Page",
+  "settings": [
+    { "type": "product", "id": "product", "label": "Product" },
+    { "type": "header", "content": "Header" },
+    { "type": "text", "id": "rating_text", "label": "Rating text", "default": "356 reviews" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Get Your Boostcous" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "High-protein | High-fiber | Couscous" },
+    { "type": "header", "content": "Gallery" },
+    { "type": "color", "id": "gallery_bg", "label": "Gallery background", "default": "#A9DCF0" },
+    { "type": "text", "id": "nutrition_button_text", "label": "Nutrition button text", "default": "View Nutrition Label" },
+    { "type": "text", "id": "nutrition_image_url", "label": "Nutrition label image URL", "default": "https://boostcous.com/cdn/shop/files/Nutritional_label.png" },
+    { "type": "header", "content": "Buy box" },
+    { "type": "checkbox", "id": "show_banner", "label": "Show promo banner", "default": true },
+    { "type": "text", "id": "banner_text", "label": "Banner text", "default": "Limited Time: Subscribe & Save 15%" },
+    { "type": "text", "id": "product_title", "label": "Buy box title", "default": "Subscribe & Save" },
+    { "type": "text", "id": "cta_label", "label": "Add to cart label", "default": "Add to Cart" },
+    { "type": "paragraph", "content": "Prices, the Save % badge, and the subscription plan are read live from the selected product." },
+    { "type": "text", "id": "subscription_plan_match", "label": "Subscription plan match (name contains)", "default": "2 month" },
+    { "type": "text", "id": "subscribe_badge_label", "label": "Subscribe badge ([pct] is replaced)", "default": "Save [pct]%" },
+    { "type": "text", "id": "onetime_badge", "label": "One-time badge", "default": "One-Time" },
+    { "type": "text", "id": "frequency_note", "label": "Frequency note added to pack labels", "default": "delivered every 2 months" },
+    { "type": "header", "content": "Brand colors" },
+    { "type": "color", "id": "color_primary", "label": "Primary color", "default": "#235CAF" },
+    { "type": "color", "id": "color_accent", "label": "Accent color", "default": "#FFA336" },
+    { "type": "color", "id": "color_card_bg", "label": "Buy box background", "default": "#F4FAFE" },
+    { "type": "color", "id": "color_badge_bg", "label": "Badge / tint background", "default": "#DBF4FC" }
+  ],
+  "blocks": [
+    {
+      "type": "trust",
+      "name": "Trust badge",
+      "settings": [
+        { "type": "text", "id": "icon_url", "label": "Icon image URL" },
+        { "type": "text", "id": "text", "label": "Text", "default": "FREE avg 2-day shipping today" }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Why Boostcous?" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Add accordion content here.</p>" }
+      ]
+    },
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        { "type": "text", "id": "icon_url", "label": "Icon image URL" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "18g of Protein" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "To fuel muscle growth and keep you full longer" }
+      ]
+    },
+    {
+      "type": "perk",
+      "name": "Buy box perk",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Perk text", "default": "Delivered every 2 months + FREE avg 2-day shipping" }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Buy box stat",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Stat value", "default": "18g" },
+        { "type": "text", "id": "label", "label": "Stat label", "default": "Protein per serving" },
+        { "type": "checkbox", "id": "show_star", "label": "Show star icon", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Boostcous Product Page",
+      "blocks": [
+        { "type": "trust", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/477c8abf-7f22-419f-a437-7618a8373827", "text": "Ships within 24 Hours Mon-Fri" } },
+        { "type": "trust", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/a603dfe7-3f1d-403e-9618-c72ac461132e", "text": "FREE avg 2-day shipping today" } },
+        { "type": "trust", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/0f678f5c-cfad-4be2-aedc-ea78a1b222d6", "text": "30-day Money Back Guarantee" } },
+        { "type": "accordion", "settings": { "heading": "Why Boostcous?", "content": "<p>Because your carbs should pull their weight! Traditional grains fall short on protein. Boostcous is different. A light, fluffy couscous with complete plant-based protein and clean ingredients. It's a smarter staple that keeps you full, supports recovery, and powers busy days. From post-workout bowls to weeknight dinners, Boostcous makes eating well effortless.</p>" } },
+        { "type": "accordion", "settings": { "heading": "Ingredients", "content": "<p>Boostcous is made with 3 simple non-GMO and Glyphosate free ingredients: Chickpea flour, Lentil flour and Pea flour. All ingredients have been tested for Glyphosate by 3rd party testing facilities and have been found to be Glyphosate free.</p>" } },
+        { "type": "accordion", "settings": { "heading": "Directions", "content": "<p>Bring a large pot of salted water to a boil. Add 1 box of Boostcous and stir well (some foaming is normal). Reduce to a simmer and cook for 5-7 minutes depending on your desired firmness. Strain well, rinse with warm water, and serve with your favorite dish. Enjoy!</p><p>Boil in generously salted water and do not overcook — rinse after draining.</p>" } },
+        { "type": "accordion", "settings": { "heading": "Benefits", "content": "<p>The benefits of Boostcous make up a long list. Try saying all of this with one breath of air: gut health, recovery, strength building, curbing hunger cravings, and overall health.</p>" } },
+        { "type": "perk", "settings": { "text": "Delivered every 2 months + FREE avg 2-day shipping" } },
+        { "type": "perk", "settings": { "text": "Your lowest price per serving, guaranteed" } },
+        { "type": "perk", "settings": { "text": "Pause, skip, or cancel anytime!" } },
+        { "type": "stat", "settings": { "value": "18g", "label": "Protein per serving" } },
+        { "type": "stat", "settings": { "value": "4.9", "label": "Based on 374+ reviews", "show_star": true } },
+        { "type": "stat", "settings": { "value": "30-Day", "label": "Money-back guarantee" } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/346e77c5-8e50-4b73-a84b-3e13814c2d18", "heading": "18g of Protein", "text": "To fuel muscle growth and keep you full longer" } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/50237dac-88b6-4e62-8f50-938a25f918cc", "heading": "11g of Fiber", "text": "Boost your fiber intake to support regularity and digestive comfort." } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/57db3a26-0f60-4f82-b94b-e2c86ee6da8b", "heading": "Cooks in 5 minutes", "text": "We know you're busy. Boostcous cooks in a fraction of the time of other carbs like rice and pasta so you can make it in a hurry." } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/1f6f87bb-cfe3-4547-a134-41163bcd9dcd", "heading": "Gluten Free", "text": "Finally a GF Couscous. Boostcous is certified gluten-free per BRCGS Gluten-Free Certification Program (GFCP) Standards and Policies." } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/c2484a57-4436-4fb2-9841-3aa5d729aa1a", "heading": "Top 9 allergen free", "text": "Free of: Milk, Eggs, Fish, Shellfish, Tree nuts, Peanuts, Wheat, Soybeans, Sesame" } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/e9616506-42f8-4b44-a145-1ce76f9291fa", "heading": "Kosher", "text": "Boostcous is certified Kosher through COR" } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/66650fac-8695-467c-9e6e-90d4bb815d54", "heading": "Vegan", "text": "Boostcous is certified Vegan and is a great source of plant based protein" } },
+        { "type": "benefit", "settings": { "icon_url": "https://assets.replocdn.com/projects/a3e12dc3-6301-4228-ba63-10e84ff60c2b/2d71f39c-2756-4183-b220-b9b1d6d72c38", "heading": "Non-GMO", "text": "We source our beans and flour from a Non-GMO Project farm in the USA" } }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "product", "page"]
+  }
+}
+{% endschema %}

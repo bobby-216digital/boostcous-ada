@@ -1,0 +1,517 @@
+{%- comment -%}
+  Community Recipe Wall
+  Uniform cards in a grid; click a card to open the full photo and description.
+  Draft metaobjects are not returned to the storefront, so Draft/Active is the approval gate.
+{%- endcomment -%}
+
+{%- paginate shop.metaobjects.community_recipe.values by 120 -%}
+{%- liquid
+  assign entries = shop.metaobjects.community_recipe.values
+  assign limit = section.settings.max_entries | default: 60
+
+  assign protein_str = ''
+  assign fiber_str = ''
+  for entry in entries
+    for p in entry.protein.value
+      assign protein_str = protein_str | append: p | append: '~'
+    endfor
+    for f in entry.fiber.value
+      assign fiber_str = fiber_str | append: f | append: '~'
+    endfor
+  endfor
+  assign protein_tags = protein_str | split: '~' | uniq | sort
+  assign fiber_tags = fiber_str | split: '~' | uniq | sort
+-%}
+
+<style>
+  .bc-wall {
+    --wall-bg: {{ section.settings.bg_color | default: '#fefdf8' }};
+    --wall-ink: #173056;
+    --wall-link: #235caf;
+    --wall-muted: #1730568f;
+    --wall-hairline: #17305614;
+    background-color: var(--wall-bg);
+    padding: 48px 20px 72px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--wall-ink);
+  }
+  .bc-wall__inner { max-width: 1472px; margin: 0 auto; }
+
+  .bc-wall__head { max-width: 620px; margin-bottom: 32px; }
+  .bc-wall__title {
+    font-family: serif;
+    font-size: 72px;
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -1.5px;
+    margin: 0 0 16px;
+    color: var(--wall-ink);
+  }
+  .bc-wall__intro { font-size: 17px; line-height: 1.7; color: #173056cc; }
+  .bc-wall__intro > *:last-child { margin-bottom: 0; }
+
+  .bc-wall__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px 12px;
+    padding: 20px 0;
+    border-top: 1px solid var(--wall-hairline);
+    border-bottom: 1px solid var(--wall-hairline);
+    margin-bottom: 32px;
+  }
+  .bc-wall__filter-label { font-size: 13px; font-weight: 600; color: var(--wall-muted); margin-right: 4px; }
+  .bc-wall__chip {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--wall-ink);
+    background: #ffffff;
+    border: 1px solid #17305626;
+    border-radius: 30px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+  }
+  .bc-wall__chip:hover { border-color: #17305659; }
+  .bc-wall__chip[aria-pressed="true"] { background: var(--wall-ink); border-color: var(--wall-ink); color: #ffffff; }
+  .bc-wall__chip:focus-visible { outline: 2px solid var(--wall-link); outline-offset: 2px; }
+  .bc-wall__chip--clear { background: transparent; border-color: transparent; color: var(--wall-link); font-weight: 600; padding-left: 4px; }
+  .bc-wall__divider { width: 1px; align-self: stretch; background: var(--wall-hairline); margin: 0 6px; }
+
+  /* Uniform grid */
+  .bc-wall__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    align-items: stretch;
+  }
+  .bc-wall__item { display: flex; }
+  .bc-wall__item[hidden] { display: none; }
+
+  .bc-card {
+    font: inherit;
+    text-align: left;
+    width: 100%;
+    padding: 0;
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid #17305614;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    transition: box-shadow .2s ease, transform .2s ease;
+  }
+  .bc-card:hover { box-shadow: 0 10px 30px #17305614; }
+  .bc-card:focus-visible { outline: 2px solid var(--wall-link); outline-offset: 3px; }
+
+  .bc-card__img-wrap { position: relative; aspect-ratio: 4 / 5; background: #f7f4ec; }
+  .bc-card__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bc-card__expand {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffffe6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--wall-ink);
+  }
+
+  .bc-card__body { padding: 16px 16px 18px; display: flex; flex-direction: column; flex: 1; }
+  .bc-card__title {
+    font-family: serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.4px;
+    margin: 0 0 8px;
+    color: var(--wall-ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.3em;
+  }
+  .bc-card__how {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #173056cc;
+    margin: 0 0 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bc-card__foot {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--wall-hairline);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--wall-muted);
+  }
+  .bc-card__credit { font-weight: 600; color: #173056b3; }
+  .bc-card__more { color: var(--wall-link); font-weight: 600; }
+
+  .bc-share {
+    background: var(--wall-ink);
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 28px 22px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+  }
+  .bc-share__title { font-family: serif; font-size: 28px; font-weight: 400; line-height: 1.05; margin: 0 0 12px; color: #ffffff; }
+  .bc-share__text { font-size: 15px; line-height: 1.6; color: #ffffffd9; margin: 0 0 18px; }
+  .bc-share__text > *:last-child { margin-bottom: 0; }
+  .bc-share__btn {
+    align-self: flex-start;
+    background: #ffffff;
+    color: var(--wall-ink);
+    padding: 11px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .bc-share__btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+
+  .bc-wall__empty { display: none; padding: 48px 0; font-size: 17px; color: #173056cc; }
+  .bc-wall__empty.is-shown { display: block; }
+
+  /* Expanded view */
+  .bc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #0c1e3ac2;
+  }
+  .bc-modal.is-open { display: flex; }
+  .bc-modal__panel {
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    max-width: 940px;
+    width: 100%;
+    max-height: 88vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .bc-modal__img { width: 100%; height: 100%; object-fit: cover; display: block; background: #f7f4ec; }
+  .bc-modal__body { padding: 32px; overflow-y: auto; }
+  .bc-modal__title { font-family: serif; font-size: 34px; font-weight: 400; line-height: 1.05; letter-spacing: -0.8px; margin: 0 0 16px; color: var(--wall-ink); }
+  .bc-modal__how { font-size: 16px; line-height: 1.7; color: #173056cc; margin: 0 0 20px; white-space: pre-line; }
+  .bc-modal__adds { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .bc-modal__add { font-size: 12px; font-weight: 500; padding: 6px 11px; border-radius: 20px; background: #f7f4ec; color: #173056b3; }
+  .bc-modal__foot { padding-top: 16px; border-top: 1px solid var(--wall-hairline); font-size: 14px; color: var(--wall-muted); display: flex; justify-content: space-between; gap: 12px; }
+  .bc-modal__credit { font-weight: 600; color: #173056b3; }
+  .bc-modal__ig { color: var(--wall-link); font-weight: 600; text-decoration: none; }
+  .bc-modal__close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #ffffffe6;
+    color: var(--wall-ink);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .bc-modal__close:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+
+  @media (max-width: 1279px) { .bc-wall__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .bc-wall__title { font-size: 60px; } }
+  @media (max-width: 1023px) {
+    .bc-wall__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bc-wall__inner { max-width: 720px; }
+    .bc-modal__panel { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .bc-modal__img { max-height: 38vh; }
+    .bc-modal__body { padding: 24px; }
+  }
+  @media (max-width: 639px) {
+    .bc-wall { padding: 32px 16px 56px; }
+    .bc-wall__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .bc-wall__title { font-size: 44px; }
+    .bc-card__title { font-size: 18px; }
+    .bc-modal { padding: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bc-wall__chip, .bc-card { transition: none; }
+  }
+</style>
+
+<div class="bc-wall" id="bc-wall-{{ section.id }}">
+  <div class="bc-wall__inner">
+
+    <div class="bc-wall__head">
+      <h1 class="bc-wall__title">{{ section.settings.title | default: 'How we eat Boostcous' }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <div class="bc-wall__intro">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if protein_tags.size > 0 or fiber_tags.size > 0 -%}
+      <div class="bc-wall__filters">
+        {%- if protein_tags.size > 0 -%}
+          <span class="bc-wall__filter-label">Protein</span>
+          {%- for tag in protein_tags -%}
+            <button type="button" class="bc-wall__chip" aria-pressed="false" data-group="protein" data-value="{{ tag | downcase | strip }}">{{ tag }}</button>
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if protein_tags.size > 0 and fiber_tags.size > 0 -%}
+          <span class="bc-wall__divider" aria-hidden="true"></span>
+        {%- endif -%}
+        {%- if fiber_tags.size > 0 -%}
+          <span class="bc-wall__filter-label">Fiber</span>
+          {%- for tag in fiber_tags -%}
+            <button type="button" class="bc-wall__chip" aria-pressed="false" data-group="fiber" data-value="{{ tag | downcase | strip }}">{{ tag }}</button>
+          {%- endfor -%}
+        {%- endif -%}
+        <button type="button" class="bc-wall__chip bc-wall__chip--clear" data-wall-clear hidden>Clear</button>
+      </div>
+    {%- endif -%}
+
+    <div class="bc-wall__grid">
+      {%- comment -%} Newest first: metaobject IDs increase over time, so sort by ID descending. {%- endcomment -%}
+      {%- liquid
+        assign id_str = ''
+        for e in entries
+          assign padded = e.system.id | prepend: '000000000000000000' | slice: -18, 18
+          assign id_str = id_str | append: padded | append: '~'
+        endfor
+        assign sorted_ids = id_str | split: '~' | sort | reverse
+      -%}
+      {%- for sort_key in sorted_ids limit: limit -%}
+      {%- assign target_id = sort_key | plus: 0 -%}
+      {%- for entry in entries -%}
+      {%- unless entry.system.id == target_id -%}{%- continue -%}{%- endunless -%}
+        {%- liquid
+          assign p_attr = ''
+          for p in entry.protein.value
+            assign p_attr = p_attr | append: p | downcase | strip | append: ','
+          endfor
+          assign f_attr = ''
+          for f in entry.fiber.value
+            assign f_attr = f_attr | append: f | downcase | strip | append: ','
+          endfor
+          assign tag_list = ''
+          for p in entry.protein.value
+            assign tag_list = tag_list | append: p | append: '~'
+          endfor
+          for f in entry.fiber.value
+            assign tag_list = tag_list | append: f | append: '~'
+          endfor
+        -%}
+        <div class="bc-wall__item" data-wall-item data-protein="{{ p_attr }}" data-fiber="{{ f_attr }}">
+          <button type="button" class="bc-card" data-wall-open
+                  data-title="{{ entry.title.value | escape }}"
+                  data-how="{{ entry.how_to.value | escape }}"
+                  data-credit="{{ entry.submitted_by.value | escape }}"
+                  data-time="{{ entry.time.value | escape }}"
+                  data-ig="{{ entry.instagram_url.value | escape }}"
+                  data-tags="{{ tag_list | escape }}"
+                  data-img="{% if entry.photo.value != blank %}{{ entry.photo.value | image_url: width: 1400 }}{% endif %}">
+            <div class="bc-card__img-wrap">
+              {%- if entry.photo.value != blank -%}
+                <img class="bc-card__img" src="{{ entry.photo.value | image_url: width: 700 }}" alt="{{ entry.title.value | escape }}" loading="lazy">
+              {%- endif -%}
+              <span class="bc-card__expand" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+              </span>
+            </div>
+            <div class="bc-card__body">
+              <h2 class="bc-card__title">{{ entry.title.value }}</h2>
+              {%- if entry.how_to.value != blank -%}
+                <p class="bc-card__how">{{ entry.how_to.value }}</p>
+              {%- endif -%}
+              <div class="bc-card__foot">
+                <span class="bc-card__credit">
+                  {%- if entry.submitted_by.value != blank -%}{{ entry.submitted_by.value }}{%- endif -%}
+                  {%- if entry.time.value != blank -%}{% if entry.submitted_by.value != blank %}, {% endif %}{{ entry.time.value }}{%- endif -%}
+                </span>
+                <span class="bc-card__more">See it</span>
+              </div>
+            </div>
+          </button>
+        </div>
+      {%- break -%}
+      {%- endfor -%}
+      {%- endfor -%}
+
+      {%- if section.settings.share_title != blank -%}
+        <div class="bc-wall__item">
+          <div class="bc-share">
+            <h2 class="bc-share__title">{{ section.settings.share_title }}</h2>
+            {%- if section.settings.share_text != blank -%}
+              <div class="bc-share__text">{{ section.settings.share_text }}</div>
+            {%- endif -%}
+            {%- if section.settings.share_btn_text != blank and section.settings.share_btn_link != blank -%}
+              <a class="bc-share__btn" href="{{ section.settings.share_btn_link }}">{{ section.settings.share_btn_text }}</a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <p class="bc-wall__empty" data-wall-empty>No bowls match that combination yet. Clear a filter to see everything.</p>
+  </div>
+
+  <div class="bc-modal" data-wall-modal role="dialog" aria-modal="true" aria-labelledby="bc-modal-title-{{ section.id }}">
+    <div class="bc-modal__panel" style="position:relative;">
+      <img class="bc-modal__img" data-modal-img alt="">
+      <button type="button" class="bc-modal__close" data-wall-close aria-label="Close">&times;</button>
+      <div class="bc-modal__body">
+        <h2 class="bc-modal__title" id="bc-modal-title-{{ section.id }}" data-modal-title></h2>
+        <p class="bc-modal__how" data-modal-how></p>
+        <div class="bc-modal__adds" data-modal-adds></div>
+        <div class="bc-modal__foot">
+          <span class="bc-modal__credit" data-modal-credit></span>
+          <a class="bc-modal__ig" data-modal-ig target="_blank" rel="noopener nofollow" hidden>Instagram</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.getElementById('bc-wall-{{ section.id }}');
+    if (!root) return;
+
+    var chips = root.querySelectorAll('[data-group]');
+    var items = root.querySelectorAll('[data-wall-item]');
+    var empty = root.querySelector('[data-wall-empty]');
+    var clear = root.querySelector('[data-wall-clear]');
+
+    function activeFor(group) {
+      var out = [];
+      root.querySelectorAll('[data-group="' + group + '"][aria-pressed="true"]').forEach(function (c) {
+        out.push(c.getAttribute('data-value'));
+      });
+      return out;
+    }
+    function matches(item, group, wanted) {
+      if (!wanted.length) return true;
+      var have = (item.getAttribute('data-' + group) || '').split(',');
+      return wanted.every(function (w) { return have.indexOf(w) !== -1; });
+    }
+    function apply() {
+      var proteins = activeFor('protein');
+      var fibers = activeFor('fiber');
+      var shown = 0;
+      items.forEach(function (item) {
+        var ok = matches(item, 'protein', proteins) && matches(item, 'fiber', fibers);
+        item.hidden = !ok;
+        if (ok) shown++;
+      });
+      var anyActive = proteins.length + fibers.length > 0;
+      if (clear) clear.hidden = !anyActive;
+      if (empty) empty.classList.toggle('is-shown', anyActive && shown === 0);
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        chip.setAttribute('aria-pressed', chip.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+        apply();
+      });
+    });
+    if (clear) {
+      clear.addEventListener('click', function () {
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+        apply();
+      });
+    }
+
+    var modal = root.querySelector('[data-wall-modal]');
+    var mImg = root.querySelector('[data-modal-img]');
+    var mTitle = root.querySelector('[data-modal-title]');
+    var mHow = root.querySelector('[data-modal-how]');
+    var mAdds = root.querySelector('[data-modal-adds]');
+    var mCredit = root.querySelector('[data-modal-credit]');
+    var mIg = root.querySelector('[data-modal-ig]');
+    var closeBtn = root.querySelector('[data-wall-close]');
+    var lastFocus = null;
+
+    function openModal(card) {
+      lastFocus = card;
+      var img = card.getAttribute('data-img');
+      if (img) { mImg.src = img; mImg.alt = card.getAttribute('data-title') || ''; mImg.hidden = false; }
+      else { mImg.removeAttribute('src'); mImg.hidden = true; }
+
+      mTitle.textContent = card.getAttribute('data-title') || '';
+      mHow.textContent = card.getAttribute('data-how') || '';
+
+      mAdds.innerHTML = '';
+      (card.getAttribute('data-tags') || '').split('~').forEach(function (t) {
+        if (!t) return;
+        var s = document.createElement('span');
+        s.className = 'bc-modal__add';
+        s.textContent = t;
+        mAdds.appendChild(s);
+      });
+
+      var credit = card.getAttribute('data-credit') || '';
+      var time = card.getAttribute('data-time') || '';
+      mCredit.textContent = credit && time ? credit + ', ' + time : (credit || time);
+
+      var ig = card.getAttribute('data-ig');
+      if (ig) { mIg.href = ig; mIg.hidden = false; } else { mIg.hidden = true; }
+
+      modal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    }
+    function closeModal() {
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      if (lastFocus) lastFocus.focus();
+    }
+
+    root.querySelectorAll('[data-wall-open]').forEach(function (card) {
+      card.addEventListener('click', function () { openModal(card); });
+    });
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    });
+  })();
+</script>
+
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Community Recipe Wall",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#fefdf8" },
+    { "type": "text", "id": "title", "label": "Page title", "default": "How we eat Boostcous" },
+    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>Five-minute bowls from the people who actually eat this stuff. Add a protein, add something green, and you have dinner.</p>" },
+    { "type": "range", "id": "max_entries", "label": "Maximum entries shown", "min": 12, "max": 120, "step": 6, "default": 60 },
+    { "type": "header", "content": "Share your bowl card" },
+    { "type": "text", "id": "share_title", "label": "Heading", "default": "Show us yours" },
+    { "type": "richtext", "id": "share_text", "label": "Text", "default": "<p>Send us a photo and a line about how you make it. Tag us on Instagram or reply to any of our emails.</p>" },
+    { "type": "text", "id": "share_btn_text", "label": "Button text", "default": "Send us a photo" },
+    { "type": "url", "id": "share_btn_link", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Community Recipe Wall" }]
+}
+{% endschema %}

@@ -1,0 +1,379 @@
+{{ 'recipe-page-template.css' | asset_url | stylesheet_tag }}
+{{ 'main-article.css' | asset_url | stylesheet_tag }}
+
+<div class="top-recipe-block">
+    <div class="recipe-page-container">
+
+        <div class="btn-block">
+            {% if section.settings.back-btn != blank %}
+                <div class="back-btn-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:319"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
+                    <a href="{{ section.settings.back-btn-link }}"> {{ section.settings.back-btn }}</a>
+                </div>
+            {% endif %}
+
+            <button class="print-recipe-btn" onclick="window.print()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:328"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg>
+                    Print Recipe
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<section class="recipe-detaisl-block">
+    <div class="recipe-page-container">
+        
+        <div class="recipe-top-row">
+            <div class="recipe-hero-image-wrapper">
+                {% if article.image %}
+                    <img src="{{ article.image | img_url: '1000x' }}" alt="{{ article.title }}">
+                {% endif %}
+            </div>
+            
+            <div class="recipe-details-card">
+                {% assign recipes_detail = article.metafields.custom.recipes_details.value %}
+                <div class="recipe-tag">{{ article.tags.first | default: 'DINNERS' }}</div>
+                <h1 class="recipe-title">{{ article.title | default: 'Crispy Buffalo Boostcous Bites with Homemade Ranch' }}</h1>
+                <p class="recipe-desc">{{ article.excerpt_or_content | strip_html | truncatewords: 30 | default: 'Crispy, dinner-ready Boostcous bites tossed in buffalo sauce and served hot with creamy herb ranch.' }}</p>
+
+                <div class="recipe-meta-grid">
+
+                    <div class="meta-box">
+                        <div class="meta-label">PREP TIME</div>
+                        <div class="meta-value">{{ recipes_detail.prep_time | default: '20 min' }}</div>
+                    </div>
+                    <div class="meta-box">
+                        <div class="meta-label">COOK TIME</div>
+                        <div class="meta-value">{{ recipes_detail.cook_time | default: '25 min' }}</div>
+                    </div>
+                    <div class="meta-box">
+                        <div class="meta-label">SERVINGS</div>
+                        <div class="meta-value">{{ recipes_detail.servings | default: '4' }}</div>
+                    </div>
+                    <div class="meta-box">
+                        <div class="meta-label">DIFFICULTY</div>
+                        <div class="meta-value">{{ recipes_detail.difficulty | default: 'Easy' }}</div>
+                    </div>
+                </div>
+
+                <div class="meta-bottom">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock3 h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:371"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16.5 12"></polyline></svg>
+                        {{ recipes_detail.total_time | default: '45 minutes total' }}
+                    </span>
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:372"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        {{ recipes_detail.servings | default: '4' }} servings
+                    </span>
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chef-hat h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:373"><path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"></path><path d="M6 17h12"></path></svg>
+                        {{ recipes_detail.difficulty | default: 'Easy' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recipe-middle-row">
+
+            <div class="recipe-ingredients-wrap">
+                <div class="wg-card">
+                    <div class="ri-header">
+                        <div class="ri-header-content">
+                            <div class="sec-subtitle">INTERACTIVE INGREDIENTS</div>
+                            <h2 class="sec-title">Ingredients</h2>
+                        </div>
+                        <div class="ri-count"><span id="ri-checked-count">0</span>/<span id="ri-total-count">0</span> checked</div>
+                    </div>
+
+                    <div class="ri-list">
+                        {% assign ingredients = article.metafields.custom.recipes_ingredients.value %}
+                        {% if ingredients != blank %}
+                            {% for ingredient in ingredients %}
+                                <label class="ri-item" onclick="toggleIngredient(this)">
+                                    <input data-loc="client/src/pages/RecipeDetailPage.tsx:399" class="mt-1 h-4 w-4 rounded border-stone-300" type="checkbox">
+                                    <div class="ri-text">{{ ingredient }}</div>
+                                </label>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recipe-instructions-wrap">
+                <div class="wg-card">
+                    <div class="sec-subtitle">STEP-BY-STEP</div>
+                    <h2 class="sec-title">Instructions</h2>
+
+                    <div class="inst-list">
+                        {% assign instructions = article.metafields.custom.instructions.value %}
+                        {% if instructions != blank %}
+                            {% for inst in instructions %}
+                            <div class="inst-item">
+                                <div class="inst-num">{{ forloop.index }}</div>
+                                <div class="inst-content">
+                                <p class="inst-desc">{{ inst }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            
+                            {% assign recipes_instructions = article.metafields.custom.recipes_instructions.value %}
+
+                            {% for instructions in recipes_instructions %}
+                                <div class="inst-item">
+                                    <div class="inst-num">{{ forloop.index }}</div>
+                                    <div class="inst-content">
+                                        <h3 class="inst-title">{{ instructions.title }}</h3>
+                                        <p class="inst-desc">{{ instructions.description }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                        {% endif %}
+                    </div>
+                </div>
+                
+
+
+
+                {% if article and article.metafields.custom.recipe_insta_block.value != blank %}
+
+                {% assign recipe_block = article.metafields.custom.recipe_insta_block.value %}
+                {% assign insta_url = recipe_block.instagram_link %}
+
+                {% if insta_url contains '?' %}
+                {% assign insta_url = insta_url | split:'?' | first %}
+                {% endif %}
+
+                {% assign embed_url = insta_url | append: "embed" %}
+
+                <section class="recipe-insta-section">
+                <div class="recipe-insta-wrapper">
+
+                    {% if recipe_block.sub_title != blank %}
+                    <p class="recipe-subtitle">{{ recipe_block.sub_title }}</p>
+                    {% endif %}
+
+                    {% if recipe_block.title != blank %}
+                    <h2 class="recipe-title">{{ recipe_block.title }}</h2>
+                    {% endif %}
+
+                    {% if recipe_block.content != blank %}
+                    <div class="recipe-content">
+                        {{ recipe_block.content | metafield_tag }}
+                    </div>
+                    {% endif %}
+
+                    {% if recipe_block.instagram_link != blank %}
+                      <div class="recipe-embed-block">
+                        <div class="recipe-embed">
+                            <iframe 
+                            src="{{ embed_url }}" 
+                            width="100%" 
+                            height="710"
+                            frameborder="0"
+                            scrolling="no"
+                            allowfullscreen>
+                            </iframe>
+                        </div>
+
+                        {% if recipe_block.button_text != blank and recipe_block.button_link != blank %}
+                            <div class="recipe-button">
+                                <a href="{{ recipe_block.button_link }}" target="_blank" class="insta-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:146"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>
+                                    {{ recipe_block.button_text }}
+                                </a>
+                            </div>
+                        {% endif %}
+
+                      </div>
+                    {% endif %}
+
+
+
+                </div>
+            </section>
+
+                {% endif %}
+
+
+                <div class="rr-section-wrap wg-card">
+                    <div class="rr-header-wrapper">
+                        <div>
+                            <div class="sec-subtitle">KEEP COOKING</div>
+                            <h2 class="sec-title">Related Recipes</h2>
+                            <p class="rr-desc">Explore more Boostcous recipes with similar flavors, formats, or weeknight-friendly cooking choices.</p>
+                        </div>
+                        <a href="/blogs/recipes" class="rr-browse-link">Browse all recipes</a>
+                    </div>
+
+                    <div class="rr-grid">
+                        {% assign related_recipes = article.metafields.custom.related_recipes.value %}
+                        {% if related_recipes != blank %}
+                            {% for recipe in related_recipes %}
+                                {% assign recipes_detail = recipe.metafields.custom.recipes_details.value %}
+                                <a href="{{ recipe.url }}" class="rr-card">
+                                    <img src="{{ recipe.image | img_url: '500x' }}" class="rr-image" alt="{{ recipe.title }}">
+                                    <div class="rr-content">
+                                        <div class="rr-tag">{{ recipe.tags.first | default: 'RECIPE' }}</div>
+                                        <h3 class="rr-card-title">{{ recipe.title }}</h3>
+                                        <p class="rr-card-desc">{{ recipe.excerpt | default: recipe.content | strip_html | truncatewords: 20 }}</p>
+                                        <div class="rr-meta">
+                                            <div class="rr-meta-item">{{ recipes_detail.cook_time }}</div>
+                                            <div class="rr-meta-item">{{ recipes_detail.difficulty }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="fi-section wg-card">
+                    {% assign product = article.metafields.custom.related_product.value %}
+                    <div class="fi-image-col">
+                    <div class="fi-image-col-inner">
+                        {% if product != blank and product.featured_image %}
+                            <img src="{{ product.featured_image | img_url: '600x' }}" class="fi-image" alt="{{ product.title }}">
+                        {% endif %}
+                    </div>
+                    </div>
+                    
+                    <div class="fi-content-col">
+                        <div class="fi-subtitle">
+                            FEATURED INGREDIENT
+                            {% comment %}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>{% endcomment %}
+                        </div>
+                        <h2 class="fi-title">{% if product != blank %}{{ product.title }}{% endif %}</h2>
+                        <p class="fi-desc">{% if product != blank %}{{ product.description | strip_html | truncatewords: 30 }}{% endif %}</p>
+                    
+                        {% if product != blank %}
+                            <a href="{{ product.url }}" class="fi-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag h-4 w-4" data-loc="client/src/pages/RecipeDetailPage.tsx:524"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                Add to Cart
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    {% comment %} function toggleIngredient(element) {
+        const checkbox = element.querySelector('input[type="checkbox"]');
+        const text = element.querySelector('.ri-text');
+
+        // toggle checkbox state manually
+        checkbox.checked = !checkbox.checked;
+
+        if (checkbox.checked) {
+            element.classList.add('active');       // label par class
+            text.classList.add('line-through');    // text par line
+        } else {
+            element.classList.remove('active');
+            text.classList.remove('line-through');
+        }
+
+        updateCount();
+    }
+
+    function updateCount() {
+        const items = document.querySelectorAll('.ri-item');
+        const checkedItems = document.querySelectorAll('.ri-item.active');
+        const totalCountEl = document.getElementById('ri-total-count');
+        const checkedCountEl = document.getElementById('ri-checked-count');
+
+        if (totalCountEl) totalCountEl.innerText = items.length;
+        if (checkedCountEl) checkedCountEl.innerText = checkedItems.length;
+    }
+    
+    document.addEventListener('DOMContentLoaded', updateCount); {% endcomment %}
+
+    function toggleIngredient(element) {
+    const checkbox = element.querySelector('input[type="checkbox"]');
+    const text = element.querySelector('.ri-text');
+
+    if (checkbox.checked) {
+        element.classList.add('active');
+        text.classList.add('line-through');
+    } else {
+        element.classList.remove('active');
+        text.classList.remove('line-through');
+    }
+
+    updateCount();
+}
+
+function updateCount() {
+    const items = document.querySelectorAll('.ri-item');
+    const checkedItems = document.querySelectorAll('.ri-item input[type="checkbox"]:checked');
+    const totalCountEl = document.getElementById('ri-total-count');
+    const checkedCountEl = document.getElementById('ri-checked-count');
+
+    if (totalCountEl) totalCountEl.innerText = items.length;
+    if (checkedCountEl) checkedCountEl.innerText = checkedItems.length;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Initial count
+    updateCount();
+
+    // Checkbox change event
+    document.querySelectorAll('.ri-item input[type="checkbox"]').forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            const parentItem = this.closest('.ri-item');
+            toggleIngredient(parentItem);
+        });
+    });
+
+});
+</script>
+
+{% comment %} <script>
+    function toggleIngredient(element) {
+        const checkbox = element.querySelector('.ri-checkbox');
+        const text = element.querySelector('.ri-text');
+        checkbox.classList.toggle('checked');
+        text.classList.toggle('checked');
+        updateCount();
+    }
+
+    function updateCount() {
+        const items = document.querySelectorAll('.ri-item');
+        const checkedItems = document.querySelectorAll('.ri-checkbox.checked');
+        const totalCountEl = document.getElementById('ri-total-count');
+        const checkedCountEl = document.getElementById('ri-checked-count');
+        if (totalCountEl) totalCountEl.innerText = items.length;
+        if (checkedCountEl) checkedCountEl.innerText = checkedItems.length;
+    }
+    
+    document.addEventListener('DOMContentLoaded', updateCount);
+</script> {% endcomment %}
+
+{% schema %}
+{
+    "name": "Recipe Page Full",
+    "settings": [
+        {
+            "type": "text",
+            "id": "back-btn",
+            "label":"Back Button"
+        },
+        {
+            "type": "url",
+            "id": "back-btn-link",
+            "label":"Back Button Link"
+        },
+    ],
+    "presets": [
+        {
+            "name": "Recipe Page Full"
+        }
+    ]
+}
+{% endschema %}

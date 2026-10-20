@@ -1,0 +1,441 @@
+<style>
+.recipe-feat-highlight {
+    --recipe-bg: {{ section.settings.bg_color | default: '#f9f7f0' }};
+    --recipe-card-bg: #ffffff;
+    --recipe-text-main: #111111;
+    --recipe-text-muted: #666666;
+    --recipe-radius-main: 34px;
+    --recipe-radius-card: 26px;
+    
+    background-color: var(--recipe-bg);
+    padding: 40px 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @media(max-width:1023px) {
+        padding: 20px 16px 40px 16px;
+    }
+}
+.recipe-feat-container {
+    max-width: 1472px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    background: var(--recipe-bg);
+    border-radius: var(--recipe-radius-main);
+    overflow: hidden;
+    box-shadow: 0 0 #000, 0 0 #0000, 0 0 #0000, 0 0 #000, 0 22px 20px #1730560d;
+}
+
+@media (min-width: 1024px) {
+    .recipe-feat-container {
+        grid-template-columns: 1.03fr 1.2fr;
+        gap: 0;
+    }
+}
+
+  /* Left Hero Side */
+.recipe-feat-hero {
+    position: relative;
+    min-height: 470px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px;
+    color: #ffffff;
+    overflow: hidden;
+    border-radius: var(--recipe-radius-main);
+    @media(max-width:1024px) {
+        border-radius: 24px 24px 0 0;
+    }
+}
+
+@media (min-width: 1024px) {
+    .recipe-feat-hero {
+        min-height: 600px;
+        border-radius: var(--recipe-radius-main) 0 0 var(--recipe-radius-main);
+    }
+}
+
+.recipe-feat-hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    object-position: right;
+}
+
+.recipe-feat-hero:hover .recipe-feat-hero-bg {
+    transform: scale(1.05);
+}
+
+.recipe-feat-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #0c1e3ac2, #0c1e3a8f 42%, #0c1e3a29);
+    z-index: 2;
+    display: block !important;
+}
+
+.recipe-feat-hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 450px;
+}
+.recipe-feat-hero-title {
+    font-size: 96px;
+    font-weight: 500;
+    margin: 0 0 20px;
+    line-height: 1;
+    font-family: serif;
+    color: #fff;
+    letter-spacing: -0.2px;
+}
+.recipe-feat-hero-desc {
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+    opacity: 1;
+}
+.recipe-feat-hero-desc * {
+    margin: 0;
+}
+
+.recipe-feat-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #111111;
+    padding: 12px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    line-height: 1.2;
+    letter-spacing: 0;
+}
+
+.recipe-feat-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Right Sidebar Side */
+.recipe-feat-sidebar {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    background: #f7f4ec;
+}
+
+.recipe-feat-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.recipe-feat-sidebar-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2.4px;
+    color: #17305694;
+    font-weight: 600;
+}
+.recipe-feat-sidebar-link {
+    font-size: 14px;
+    color: #235caf;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.recipe-feat-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 640px) {
+    .recipe-feat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+  /* Blog Card */
+.recipe-feat-card {
+    background: var(--recipe-card-bg);
+    border-radius: var(--recipe-radius-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.recipe-feat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.recipe-feat-card-img-wrap {
+    aspect-ratio: 4/4.8;
+    position: relative;
+    overflow: hidden;
+}
+
+.recipe-feat-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.recipe-feat-card:hover .recipe-feat-card-img {
+    transform: scale(1.08);
+}
+
+.recipe-feat-card-info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.recipe-feat-card-meta {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #1730568f;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.recipe-feat-card-title {
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1;
+    margin: 0 0 15px;
+    font-family: serif;
+    color: #173056;
+    letter-spacing: -1.1px;
+}
+.recipe-feat-card-link {
+    margin-top: auto;
+    font-size: 14px;
+    font-weight: 600;
+    color: #235caf;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0;
+}
+
+@media(max-width:1279px) {
+    .recipe-feat-container {
+    max-width: 960px;
+}
+.recipe-feat-hero-title {
+    font-size: 80px;
+}
+.recipe-feat-hero-desc {
+    font-size: 16px;
+}
+.recipe-feat-card-title {
+    font-size: 24px;
+}
+.recipe-feat-card-meta {
+    margin-bottom: 8px;
+}
+}
+
+@media(max-width:1023px) {
+    .recipe-feat-container {
+        max-width: 720px;
+        gap: 0;
+        
+    }
+.recipe-feat-sidebar {
+    padding: 24px;
+}
+.recipe-feat-grid {
+    gap: 16px;
+}
+}
+@media(max-width:767px) {
+.recipe-feat-sidebar {
+    padding: 16px;
+}
+.recipe-feat-hero-title {
+    font-size: 60px;
+}
+.recipe-feat-hero {
+    padding: 24px;
+}
+}
+</style>
+<div class="recipe-feat-highlight" style="background-color: {{ section.settings.bg_color }};">
+  <div class="recipe-feat-container">
+    
+    <!-- Hero Side -->
+    <div class="recipe-feat-hero">
+      {% if section.settings.image != blank %}
+        <img class="recipe-feat-hero-bg" src="{{ section.settings.image | img_url: '1000x' }}" alt="{{ section.settings.title }}" loading="lazy">
+      {% else %}
+        {{ 'image' | placeholder_svg_tag: 'recipe-feat-hero-bg' }}
+      {% endif %}
+      <div class="recipe-feat-hero-overlay"></div>
+      
+      <div class="recipe-feat-hero-content">
+        <h2 class="recipe-feat-hero-title">{{ section.settings.title | default: 'Dinners.' }}</h2>
+        <div class="recipe-feat-hero-desc">
+          {{ section.settings.description | default: 'It begins with Boostcous, the fast protein couscous base that makes weeknight cooking feel brighter.' }}
+        </div>
+        <a href="{{ section.settings.btn_link | default: '#' }}" class="recipe-feat-hero-btn">
+          {{ section.settings.btn_text | default: 'View all recipes' }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Sidebar Grid -->
+    <div class="recipe-feat-sidebar">
+      <div class="recipe-feat-sidebar-header">
+        <span class="recipe-feat-sidebar-label">{{ section.settings.sidebar_label | default: 'FEATURED DINNERS' }}</span>
+        <a href="{{ section.settings.sidebar_link_url | default: '#' }}" class="recipe-feat-sidebar-link">
+          {{ section.settings.sidebar_link_text | default: 'Explore dinners' }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+        </a>
+      </div>
+
+      <div class="recipe-feat-grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'blog_post' and block.settings.article != blank %}
+            {% assign article = block.settings.article %}
+            <a href="{{ article.url }}" class="recipe-feat-card">
+              <div class="recipe-feat-card-img-wrap">
+                {% if article.image != blank %}
+                  <img class="recipe-feat-card-img" src="{{ article.image | img_url: '600x' }}" alt="{{ article.title }}" loading="lazy">
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag: 'recipe-feat-card-img' }}
+                {% endif %}
+              </div>
+              <div class="recipe-feat-card-info">
+                <div class="recipe-feat-card-meta">
+                  {{ article.tags[0] | default: 'Recipes' }} &nbsp;·&nbsp; {{ article.metafields.custom.cooking_time | default: '45 MIN' }}
+                </div>
+                <h3 class="recipe-feat-card-title">{{ article.title }}</h3>
+                <span class="recipe-feat-card-link">
+                  View recipe 
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured Blog Category",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#f9f7f0"
+    },
+    {
+      "type": "header",
+      "content": "Left Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Hero Title",
+      "default": "Dinners."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Hero Description",
+      "default": "<p>It begins with Boostcous, the fast protein couscous base that makes weeknight cooking feel brighter.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "View all recipes"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Right Sidebar Section"
+    },
+    {
+      "type": "text",
+      "id": "sidebar_label",
+      "label": "Sidebar Label",
+      "default": "FEATURED DINNERS"
+    },
+    {
+      "type": "text",
+      "id": "sidebar_link_text",
+      "label": "Sidebar Link Text",
+      "default": "Explore dinners"
+    },
+    {
+      "type": "url",
+      "id": "sidebar_link_url",
+      "label": "Sidebar Link URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "blog_post",
+      "name": "Featured Blog Post",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "article",
+          "id": "article",
+          "label": "Select Blog Post"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Blog Category",
+      "blocks": [
+        { "type": "blog_post" },
+        { "type": "blog_post" }
+      ]
+    }
+  ]
+}
+{% endschema %}

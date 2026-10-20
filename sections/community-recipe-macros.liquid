@@ -1,0 +1,91 @@
+{%- comment -%}
+  How We Eat: shows the estimated protein / fiber line on Community Recipe Wall cards, and the
+  estimated portions list in the expanded view.
+  Reads est_protein_g / est_fiber_g / est_portions from community_recipe metaobjects and adds them
+  to the matching cards (by title). Remove this section to hide the estimates.
+{%- endcomment -%}
+<style>
+  .bc-card__macros { font-size: 13px; font-weight: 600; color: #235caf; margin: 0 0 12px; }
+  .bc-modal__macros { font-size: 15px; font-weight: 600; color: #235caf; margin: 0 0 8px; }
+  .bc-card__macros span, .bc-modal__macros span { font-weight: 400; color: #1730568f; }
+  .bc-modal__portions { margin: 0 0 20px; }
+  .bc-modal__portions-label { font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: #1730568f; margin: 0 0 6px; }
+  .bc-modal__portions ul { list-style: none; margin: 0; padding: 0; font-size: 14px; line-height: 1.6; color: #173056cc; }
+  .bc-modal__portions li::before { content: '\2022'; color: #235caf; margin-right: 8px; }
+</style>
+{%- paginate shop.metaobjects.community_recipe.values by 120 -%}
+<script>
+  (function () {
+    var m = {
+      {%- for e in shop.metaobjects.community_recipe.values -%}
+        {%- if e.est_protein_g.value != blank or e.est_fiber_g.value != blank or e.est_portions.value != blank -%}
+          {{ e.title.value | json }}: [{{ e.est_protein_g.value | default: 'null' }}, {{ e.est_fiber_g.value | default: 'null' }}, {{ e.est_portions.value | default: '' | json }}],
+        {%- endif -%}
+      {%- endfor -%}
+    };
+    function txt(v) {
+      var p = [];
+      if (v[0] != null) p.push('≈' + v[0] + 'g protein');
+      if (v[1] != null) p.push(v[1] + 'g fiber');
+      return p.join(' · ');
+    }
+    function modalParts(card) {
+      var root = card.closest('.bc-wall');
+      var how = root && root.querySelector('[data-modal-how]');
+      if (!how) return null;
+      var mm = root.querySelector('.bc-modal__macros');
+      if (!mm) {
+        mm = document.createElement('p');
+        mm.className = 'bc-modal__macros';
+        how.parentNode.insertBefore(mm, how.nextSibling);
+      }
+      var pp = root.querySelector('.bc-modal__portions');
+      if (!pp) {
+        pp = document.createElement('div');
+        pp.className = 'bc-modal__portions';
+        mm.parentNode.insertBefore(pp, mm.nextSibling);
+      }
+      return [mm, pp];
+    }
+    function run() {
+      document.querySelectorAll('.bc-card[data-title]').forEach(function (card) {
+        var v = m[card.getAttribute('data-title')];
+        if (v && txt(v) && !card.querySelector('.bc-card__macros')) {
+          var el = document.createElement('p');
+          el.className = 'bc-card__macros';
+          el.textContent = txt(v);
+          var foot = card.querySelector('.bc-card__foot');
+          if (foot) foot.parentNode.insertBefore(el, foot);
+        }
+        card.addEventListener('click', function () {
+          var parts = modalParts(card);
+          if (!parts) return;
+          var mm = parts[0], pp = parts[1];
+          mm.textContent = ''; pp.innerHTML = '';
+          mm.hidden = true; pp.hidden = true;
+          if (!v) return;
+          if (txt(v)) {
+            mm.textContent = txt(v);
+            mm.hidden = false;
+          }
+          var lines = (v[2] || '').split(/\r?\n/).filter(function (l) { return l.trim(); });
+          if (lines.length) {
+            var lab = document.createElement('p');
+            lab.className = 'bc-modal__portions-label';
+            lab.textContent = 'Estimated portions';
+            var ul = document.createElement('ul');
+            lines.forEach(function (l) { var li = document.createElement('li'); li.textContent = l.trim(); ul.appendChild(li); });
+            pp.appendChild(lab); pp.appendChild(ul);
+            pp.hidden = false;
+          }
+        });
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+  })();
+</script>
+{%- endpaginate -%}
+
+{% schema %}
+{ "name": "Recipe wall macros", "settings": [] }
+{% endschema %}

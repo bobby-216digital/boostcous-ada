@@ -1,0 +1,116 @@
+.recipe-detaisl-block .fi-section {
+    border: 1px solid #e7e5e5;
+    gap: 40px;
+}
+.recipe-detaisl-block .fi-image-col{
+   border-radius:32px;
+}
+.recipe-detaisl-block img.fi-image {
+    background-color: #fff !important;
+    mix-blend-mode: unset;
+}
+.recipe-detaisl-block .fi-image-col {
+   border-radius: 32px;
+   background-image: linear-gradient(#edf6ff,#fffdfa);
+}
+.recipe-detaisl-block .fi-image-col {
+    width: 48.5%;
+}
+.recipe-detaisl-block .fi-content-col {
+    width: 51.5%; 
+    padding:0px;
+}
+.recipe-detaisl-block .fi-image-col-inner {
+    background: #fff;
+    height: 100%;
+    align-items: center;
+    border-radius: 32px;
+    display: flex;
+    box-shadow: 0 16px 45px #17305614;
+    overflow:hidden;
+    min-height: 460px;
+    /* padding: 24px; */
+    padding: 24px 0;
+}
+.recipe-detaisl-block .fi-subtitle {
+    font-family: Inter,sans-serif;
+    background-color: transparent;
+    padding: 0px;
+    border-radius: 0px;
+    display: block;
+    margin-bottom: 0px;
+    color: #bb4d00;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3.36px;
+    line-height:1.35;
+}
+.recipe-detaisl-block h2.fi-title {
+    letter-spacing: -1.2px;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    color: #0c0a0a;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 30px;
+    /* font-weight: 600; */
+    font-weight: 500;
+    line-height: 1.2;
+}
+.recipe-detaisl-block p.fi-desc {
+    margin-top: 16px;
+    margin-bottom: 0px;
+    color: #57534d;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    line-height: 2;
+}
+.recipe-detaisl-block  a.fi-button {
+   margin-top: 24px;
+   padding: 12px 20px;
+   background-color: #1c1919;
+   font-family: Inter, sans-serif;
+   text-decoration: none;
+   letter-spacing: 0px;
+   line-height:1.45;
+   font-weight:600;
+}
+.recipe-detaisl-block  a.fi-button svg{
+   height:16px;
+   width:16px;
+   display:flex;
+}
+
+@media (max-width: 1279px) {
+    .recipe-meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+    .meta-bottom {gap: 12px;}
+    .rr-grid {grid-template-columns: repeat(1, 1fr);}
+    .recipe-detaisl-block .fi-section {
+        gap: 20px;
+        flex-direction: column;
+    }
+    .recipe-detaisl-block .fi-image-col,
+    .recipe-detaisl-block .fi-content-col {width: 100%;}
+}
+
+@media (max-width: 989px) { 
+    .recipe-detaisl-block .fi-image-col-inner { 
+        min-height: auto;
+        padding: 24px;
+        border-radius: 24px;
+    }
+    .fi-image {
+        max-height: 272px;
+    }
+}
+@media (max-width: 767px) {
+    .recipe-detaisl-block .fi-image-col-inner {
+        /* min-height: 335px; */
+        padding: 24px;
+    }
+    .recipe-detaisl-block .fi-image-col {
+        padding: 24px;
+    }
+}

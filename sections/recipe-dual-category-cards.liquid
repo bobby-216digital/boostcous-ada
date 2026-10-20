@@ -1,0 +1,381 @@
+<style>
+.recipe-dual-cards {
+    --rdc-bg: {{ section.settings.bg_color | default: '#fefdf8' }};
+    --rdc-gap: 32px;
+    --rdc-radius: 34px;
+    --rdc-glass-radius: 22px;
+    --rdc-text-white: #ffffff;
+    
+    background-color: var(--rdc-bg);
+    padding: 60px 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @media(max-width:1023px) {
+        padding: 0px 16px 40px 16px;
+    }
+}
+.recipe-dual-cards {
+    background: #fbf6e7;
+    padding-top: 0;
+}
+
+.recipe-dual-wrapper {
+    max-width: 1472px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--rdc-gap);
+}
+
+@media (min-width: 1024px) {
+    .recipe-dual-wrapper {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.recipe-category-card {
+    position: relative;
+    border-radius: var(--rdc-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 50px;
+    color: var(--rdc-text-white);
+    background: #e5e5e5;
+    min-height: auto;
+}
+
+.recipe-category-card-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.recipe-category-card:hover .recipe-category-card-bg {
+    transform: scale(1.05);
+}
+
+.recipe-category-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(#0c1e3a1a,#0c1e3a6b 44%,#0c1e3ad6);
+    z-index: 2;
+    display: block !important;
+}
+/* Content Overlay */
+.recipe-category-content {
+    position: relative;
+    z-index: 3;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.recipe-category-card.full {
+    grid-column: 1/3;
+}
+
+.recipe-category-title {
+    font-size: 44px;
+    font-weight: 700;
+    margin: 0 0 20px;
+    line-height: 1.1;
+    font-family: serif;
+    letter-spacing: -0.5px;
+    color: #f9f4e8;
+}
+
+@media (min-width: 768px) {
+    .recipe-category-title {
+        font-size: 58px;
+    }
+}
+
+.recipe-category-desc {
+    font-size: 20px;
+    line-height: 1.7;
+    max-width: 490px;
+    margin-bottom: 0px;
+    opacity: 1;
+    color: #f9f4e8f0;
+    letter-spacing: 0;
+}
+
+.recipe-featured-glass {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border: none;
+    border-radius: var(--rdc-glass-radius);
+    padding: 20px 24px;
+    margin-bottom: 25px;
+    margin-top: auto;
+    max-width: 480px;
+    transition: background 0.3s ease;
+    margin-top: 5px;
+}
+
+.recipe-category-card:hover .recipe-featured-glass {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.recipe-featured-meta {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    margin-bottom: 8px;
+    display: block;
+    color: rgba(249, 244, 232, 0.74);
+}
+.recipe-featured-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    font-family: serif;
+    line-height: 1.1;
+    letter-spacing: 0;
+    color: rgb(249, 244, 232);
+}
+
+/* Button Styling */
+.recipe-category-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: oklch(0.97 0.02 86.27);
+    padding: 12px 20px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    width: fit-content;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    color: rgb(23, 48, 86);
+    letter-spacing: 0;
+}
+
+.recipe-category-btn:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.recipe-btn-arrow {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.recipe-category-btn:hover .recipe-btn-arrow {
+    transform: translateX(3px) rotate(45deg);
+}
+@media(max-width:1279px) {
+    .recipe-dual-wrapper {
+    max-width: 960px;
+}
+.recipe-category-title {
+    font-size: 48px;
+}
+.recipe-category-desc {
+    font-size: 18px;
+}
+.recipe-featured-title {
+    font-size: 24px;
+}
+.recipe-category-card {
+    padding: 50px 30px;
+}
+}
+
+@media(max-width:1023px) {
+    .recipe-dual-wrapper {
+        max-width: 720px;
+    }
+.recipe-category-card.full {
+    grid-column: 1/2;
+}
+}
+@media(max-width:767px) {
+.recipe-category-card {
+    padding: 24px;
+}
+.recipe-featured-title {
+    font-size: 22px;
+}
+.recipe-category-title {
+    font-size: 40px;
+}
+.recipe-category-desc {
+    font-size: 16px;
+}
+}
+</style>
+
+<div class="recipe-dual-cards">
+  <div class="recipe-dual-wrapper">
+    {% for block in section.blocks %}
+      {% if block.type == 'category_card' %}
+        <div class="recipe-category-card {{ block.settings.width }}" {{ block.shopify_attributes }}>
+          
+          {% if block.settings.bg_image != blank %}
+            <img class="recipe-category-card-bg" src="{{ block.settings.bg_image | img_url: '1200x' }}" alt="{{ block.settings.title }}" loading="lazy">
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'recipe-category-card-bg' }}
+          {% endif %}
+           
+          <div class="recipe-category-card-overlay"></div>
+          
+          <div class="recipe-category-content">
+            {% if block.settings.title != blank %}
+            <h2 class="recipe-category-title">{{ block.settings.title | default: 'Category' }}</h2>
+            {% endif %}
+            
+            {% if block.settings.description != blank %}
+              <div class="recipe-category-desc">
+                {{ block.settings.description }}
+              </div>
+            {% endif %}
+
+            {% if block.settings.featured_article != blank %}
+              {% assign article = block.settings.featured_article %}
+              <a href="{{ article.url }}" class="recipe-featured-glass" style="text-decoration: none; color: inherit;">
+                <span class="recipe-featured-meta">
+                  {% if block.settings.meta_label != blank %}{{ block.settings.meta_label }}{% else %}FEATURED RECIPE{% endif %} 
+                  &nbsp;·&nbsp; 
+                  {% if article.metafields.custom.cooking_time != blank %}{{ article.metafields.custom.cooking_time }}{% else %}60 MIN{% endif %}
+                </span>
+                <h3 class="recipe-featured-title">{% if block.settings.boxTitle != blank %}{{ block.settings.boxTitle }}{% else %}{{ article.title }}{% endif %}</h3>
+              </a>
+            {% endif %}
+
+            {% if block.settings.btn_text != blank %}
+              <a href="{{ block.settings.btn_link | default: '#' }}" class="recipe-category-btn">
+                {{ block.settings.btn_text }}
+                <svg class="recipe-btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Dual Blog Category Cards",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#fefdf8"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_card",
+      "name": "Category Card",
+      "settings": [
+        {
+            "type":"select",
+            "id":"width",
+            "label": "Select Grid Width",
+            "options": [
+                {
+                    "label": "50%",
+                    "value": "half"
+                },
+                {
+                    "label": "100%",
+                    "value": "full"
+                }
+            ]
+        },
+        {
+          "type": "image_picker",
+          "id": "bg_image",
+          "label": "Card Background Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "Salads"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Category Description",
+          "default": "Fresh herbs, crisp produce, and Boostcous turn salads into something more complete."
+        },
+        {
+          "type": "header",
+          "content": "Featured Recipe Overlay"
+        },
+        {
+            "type":"text",
+            "id":"boxTitle",
+            "label":"Box Title"
+        },
+        {
+          "type": "article",
+          "id": "featured_article",
+          "label": "Featured Blog Post"
+        },
+        {
+          "type": "text",
+          "id": "meta_label",
+          "label": "Meta Label",
+          "default": "FEATURED RECIPE"
+        },
+        {
+          "type": "header",
+          "content": "Button Settings"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Button Text",
+          "default": "See all salads"
+        },
+        {
+          "type": "url",
+          "id": "btn_link",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Dual Blog Category Cards",
+      "blocks": [
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Salads",
+            "btn_text": "See all salads"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "One Pan Dishes",
+            "btn_text": "See all one pan dishes"
+          }
+        }
+      ]
+    } 
+  ]
+}
+{% endschema %}

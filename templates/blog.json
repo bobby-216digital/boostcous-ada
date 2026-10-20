@@ -1,0 +1,138 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "sc_blog_list_BV3p99": {
+      "type": "sc-blog-list",
+      "blocks": {
+        "link_howweeat": {
+          "type": "link",
+          "settings": {
+            "label": "How We Eat Boostcous",
+            "url": "shopify://pages/how-we-eat"
+          }
+        },
+        "blog_WL9mUB": {
+          "type": "blog",
+          "disabled": true,
+          "settings": {
+            "blog": "f-f"
+          }
+        },
+        "blog_hzBTzA": {
+          "type": "blog",
+          "settings": {
+            "blog": "dinners"
+          }
+        },
+        "blog_yxUaRE": {
+          "type": "blog",
+          "settings": {
+            "blog": "salads"
+          }
+        },
+        "blog_T84iLH": {
+          "type": "blog",
+          "settings": {
+            "blog": "one-pan-dishes"
+          }
+        },
+        "blog_Qf3fUj": {
+          "type": "blog",
+          "settings": {
+            "blog": "desserts"
+          }
+        }
+      },
+      "block_order": [
+        "link_howweeat",
+        "blog_WL9mUB",
+        "blog_hzBTzA",
+        "blog_yxUaRE",
+        "blog_T84iLH",
+        "blog_Qf3fUj"
+      ],
+      "name": "Sc Blog List",
+      "settings": {
+        "link": "shopify://pages/recipes",
+        "title": "Explore"
+      }
+    },
+    "main": {
+      "type": "main-blog",
+      "blocks": {
+        "recipe_9qTfjP": {
+          "type": "recipe",
+          "settings": {
+            "blog-title": "dinners",
+            "recipe_image": "shopify://shop_images/boostcous-dinners-hero-dinner-refresh-v2-W63fNSZwE72rsJHfZTadhH_1.webp",
+            "recipe_sub_title": "Boostcous category",
+            "recipe_title": "Dinners",
+            "recipe_description": "It begins with Boostcous, the fast protein couscous base that makes weeknight cooking feel brighter. Ready in 5 minutes and built to stand in for rice or pasta, it soaks up the flavors of the sauces, vegetables, and curries you layer on top.",
+            "recipe_bottom_text": "Boostcous protein couscous dinner recipes"
+          }
+        },
+        "recipe_gADbwY": {
+          "type": "recipe",
+          "settings": {
+            "blog-title": "salads",
+            "recipe_image": "shopify://shop_images/harvest-salad-editorial-v2_b67e34c3_2.png",
+            "recipe_sub_title": "Boostcous category",
+            "recipe_title": "Salads",
+            "recipe_description": "Fresh herbs, crisp produce, and Boostcous turn salads into something more complete. This gluten-free couscous alternative cooks in 5 minutes, brings protein and fiber to the bowl, and adds the texture and staying power that keep every bite interesting.",
+            "recipe_bottom_text": "Boostcous gluten-free couscous salad recipes"
+          }
+        },
+        "recipe_cYrWrU": {
+          "type": "recipe",
+          "settings": {
+            "blog-title": "one-pan-dishes",
+            "recipe_image": "shopify://shop_images/baked-chicken-editorial-v3_3a9a0e75_1.png",
+            "recipe_sub_title": "Boostcous category",
+            "recipe_title": "One Pan Dishes",
+            "recipe_description": "Boostcous keeps one-pan cooking quick, colorful, and deeply comforting. It absorbs bold flavor fast, shortens the path from stovetop to table, and gives you an easier protein-packed alternative to the usual rice-and-pasta routine.",
+            "recipe_bottom_text": "Boostcous one pan protein couscous recipes"
+          }
+        },
+        "recipe_njwCGx": {
+          "type": "recipe",
+          "settings": {
+            "blog-title": "desserts",
+            "recipe_image": "shopify://shop_images/boostcous-pudding-editorial-v3_c5ad63f7_1.png",
+            "recipe_sub_title": "Boostcous category",
+            "recipe_title": "Desserts",
+            "recipe_description": "Sweet recipes can start with Boostcous too. Its delicate texture brings a playful twist to fruit-forward finishes, creamy puddings, and spoonable desserts that feel comforting, unexpected, and easy to make your own.",
+            "recipe_bottom_text": "Boostcous dessert recipes"
+          }
+        }
+      },
+      "block_order": [
+        "recipe_9qTfjP",
+        "recipe_gADbwY",
+        "recipe_cYrWrU",
+        "recipe_njwCGx"
+      ],
+      "settings": {
+        "show_excerpt": true,
+        "layout": "collage",
+        "show_image": true,
+        "image_height": "medium",
+        "show_date": true,
+        "show_author": false,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "sc_blog_list_BV3p99",
+    "main"
+  ]
+}

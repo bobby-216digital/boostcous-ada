@@ -1,0 +1,35 @@
+{% comment %}
+  Renders a sticky Add to Cart bar that appears when the main ATC button is out of the viewport.
+  Accepts:
+  - product: {Object} product object.
+  - product_form_id: {String} product form id.
+  - section_id: {String} section id.
+
+  Usage:
+  {% render 'sticky-atc', product: product, product_form_id: product_form_id, section_id: section_id %}
+{% endcomment %}
+
+<div id="StickyAtc" class="sticky-atc">
+  <button
+    type="submit"
+    form="{{ product_form_id }}"
+    class="sticky-atc__button button button--primary"
+    {% if product.selected_or_first_available_variant.available == false
+      or product.selected_or_first_available_variant == null
+    %}
+      disabled
+    {% endif %}
+  >
+    {%- if product.selected_or_first_available_variant == null -%}
+      {{ 'products.product.unavailable' | t }}
+    {%- elsif product.selected_or_first_available_variant.available == false -%}
+      {{ 'products.product.sold_out' | t }}
+    {%- else -%}
+      {%- if atc_button_text != blank -%}
+        {{ atc_button_text }}
+      {%- else -%}
+        {{ 'products.product.add_to_cart' | t }}
+      {%- endif -%}
+    {%- endif -%}
+  </button>
+</div>

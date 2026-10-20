@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "store_locator": {
+      "type": "store-locator",
+      "name": "Store Locator",
+      "settings": {
+        "bg_color": "#fbf5e6",
+        "eyebrow": "STORE LOCATOR",
+        "title": "Find Boostcous near you",
+        "intro": "<p>Boostcous is on shelves at independent grocers, natural food stores and cafes across the country. Search by ZIP code or city to find the closest one, or order from us and we will ship it to your door.</p>",
+        "search_placeholder": "ZIP code, city, or state",
+        "search_label": "Search by ZIP code, city, or state",
+        "online_title": "Prefer to order online?",
+        "online_copy": "Order straight from us and we will ship it anywhere in the US.",
+        "shop_url": "/collections/all",
+        "cta_title": "Not in a store near you yet?",
+        "cta_copy": "Tell us where you shop and we will do the asking. Buyers and retailers can reach our wholesale team the same way.",
+        "cta_button_label": "Request Boostcous at my store",
+        "cta_button_url": "mailto:hey@boostcous.com?subject=Boostcous%20store%20request",
+        "cta_button_2_label": "Wholesale enquiries",
+        "cta_button_2_url": "shopify://pages/wholesale-page",
+        "tile_url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        "label_url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+        "max_native_zoom": "16",
+        "tile_attribution": "Tiles &copy; Esri",
+        "contact_email": "hey@boostcous.com"
+      }
+    }
+  },
+  "order": ["store_locator"]
+}

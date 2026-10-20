@@ -1,0 +1,77 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "sc_blog_list_howweeat": {
+      "type": "sc-blog-list",
+      "blocks": {
+        "link_howweeat": {
+          "type": "link",
+          "settings": {
+            "label": "How We Eat Boostcous",
+            "url": "shopify://pages/how-we-eat"
+          }
+        },
+        "blog_dinners": {
+          "type": "blog",
+          "settings": { "blog": "dinners" }
+        },
+        "blog_salads": {
+          "type": "blog",
+          "settings": { "blog": "salads" }
+        },
+        "blog_onepan": {
+          "type": "blog",
+          "settings": { "blog": "one-pan-dishes" }
+        },
+        "blog_desserts": {
+          "type": "blog",
+          "settings": { "blog": "desserts" }
+        }
+      },
+      "block_order": [
+        "link_howweeat",
+        "blog_dinners",
+        "blog_salads",
+        "blog_onepan",
+        "blog_desserts"
+      ],
+      "name": "Sc Blog List",
+      "settings": {
+        "link": "shopify://pages/recipes",
+        "title": "Explore"
+      }
+    },
+    "community_recipe_wall": {
+      "type": "community-recipe-grid",
+      "name": "Community Recipe Wall",
+      "settings": {
+        "bg_color": "#fefdf8",
+        "title": "How we eat Boostcous",
+        "intro": "<p>Five-minute bowls from the people who actually eat this stuff. Pick a protein, add something green, and dinner is done. Every bowl here is real, from our kitchen or a customer's.</p>",
+        "max_entries": 60,
+        "share_title": "Show us yours",
+        "share_text": "<p>Send a photo and a line about how you make it. Tag us on Instagram or reply to any of our emails.</p>",
+        "share_btn_text": "Send us a photo",
+        "share_btn_link": "mailto:brian@boostcous.com?subject=HOW%20WE%20EAT%20BOOSTCOUS"
+      }
+    },
+    "community_recipe_macros": {
+      "type": "community-recipe-macros",
+      "name": "Recipe wall macros",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "sc_blog_list_howweeat",
+    "community_recipe_wall",
+    "community_recipe_macros"
+  ]
+}

@@ -1,0 +1,53 @@
+/* Boostcous accessibility fixes for Replo + app content — Oct 2026 */
+
+/* Fuzzy text: only one weight of Menca-Medium is loaded, so the browser was
+   faking bold/thin text and blurring it. Render the real font instead. */
+[data-rid],
+[data-rid] * {
+  font-synthesis: none;
+}
+
+/* Replo image wrappers default to overflow:auto, which creates keyboard-
+   unreachable scroll areas. Images already fit their frame. */
+[data-rid] picture {
+  overflow: hidden !important;
+}
+
+/* Judge.me star badge text: faded blue on cream was 3.6:1 */
+.jdgm-prev-badge__text {
+  color: rgb(35, 92, 175) !important;
+}
+
+/* Orange call-to-action buttons: white on orange was 2.0:1. Use black text,
+   matching the existing SHOP NOW buttons (10.5:1). */
+[data-rid="8803de8b-87c0-4dca-8bfd-199bc5d3e812"],
+[data-rid="8803de8b-87c0-4dca-8bfd-199bc5d3e812"] *,
+[data-rid="78ecc910-9195-4215-81f3-757ba3897502"],
+[data-rid="78ecc910-9195-4215-81f3-757ba3897502"] * {
+  color: #000000 !important;
+}
+
+/* Carousel "Slide 1 of 6" counter: 75% brand blue on white was 4.2:1 */
+[data-rid="2b397fcc-3a90-40d7-bcc7-f365c5069ac3"],
+[data-rid="2b397fcc-3a90-40d7-bcc7-f365c5069ac3"] * {
+  color: rgb(35, 92, 175) !important;
+}
+
+/* Judge.me review widget text on cream: grey/faded blue was 2.4-3.9:1 */
+.jdgm-rev-widg__summary-text,
+.jdgm-histogram__frequency,
+.jdgm-gallery-title,
+.jdgm-rev__timestamp,
+.jdgm-rev__title,
+.jdgm-rev__body,
+.jdgm-rev__body p,
+.jdgm-rev__author,
+.jdgm-medal__value,
+.jdgm-sort-dropdown,
+.jdgm-sort-dropdown option,
+.jdgm-sort-dropdown-wrapper,
+.jdgm-sort-dropdown-arrow,
+.jdgm-rev-widg__title,
+.jdgm-link {
+  color: rgb(35, 92, 175) !important;
+}

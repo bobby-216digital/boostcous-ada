@@ -1,0 +1,47 @@
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-center",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "mega",
+        "sticky_header_type": "none",
+        "show_line_separator": true,
+        "color_scheme": "scheme-5",
+        "menu_color_scheme": "scheme-5",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "enable_customer_avatar": true,
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    },
+    "17801726441a0b3a9c": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "1780173324f224731f": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "a11y_fixes": {
+      "type": "a11y-fixes",
+      "settings": {}
+    }
+  },
+  "order": [
+    "header",
+    "17801726441a0b3a9c",
+    "1780173324f224731f",
+    "a11y_fixes"
+  ]
+}

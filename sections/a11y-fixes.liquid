@@ -1,0 +1,19 @@
+{%- comment -%}
+  Boostcous accessibility fixes (Oct 2026). Loads assets/a11y-fixes.css and
+  assets/a11y-fixes.js on every page via the header group.
+  Roll back: remove this section from sections/header-group.json.
+{%- endcomment -%}
+{{ 'a11y-fixes.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'a11y-fixes.js' | asset_url }}" defer="defer"></script>
+{{ 'a11y-replo.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'a11y-replo.js' | asset_url }}" defer="defer"></script>
+{{ 'a11y-colors-proposed.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "Accessibility fixes",
+  "tag": "div",
+  "class": "a11y-fixes-loader",
+  "settings": []
+}
+{% endschema %}

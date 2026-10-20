@@ -1,0 +1,277 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "rich_text_XatVa9": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_zXmVG8": {
+          "type": "heading",
+          "settings": {
+            "heading": "Certifications",
+            "heading_size": "h1"
+          }
+        },
+        "text_EKTwnB": {
+          "type": "text",
+          "settings": {
+            "text": "<p>At Boostcous, transparency matters. We’re committed to making clean, trustworthy products and sharing the standards behind them. Below you’ll find information about our glyphosate testing, kosher certification,  Non-GMO commitment, and gluten-free certification status.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_zXmVG8",
+        "text_EKTwnB"
+      ],
+      "disabled": true,
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "left",
+        "content_alignment": "left",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "multicolumn_aXtte7": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_rPeXhL": {
+          "type": "column",
+          "settings": {
+            "title": "Glyphosate",
+            "text": "<h4></h4><h4><strong>Not Detected</strong></h4><h6>Every production run is independently tested by a third-party laboratory for glyphosate and related herbicides. We test for <strong>glyphosate, AMPA, and glufosinate</strong>, using advanced <strong>LC-MS/MS analytical methods</strong>.</h6><h6></h6><h6><strong>Result:</strong><br/>Glyphosate — <strong>Not Detected</strong><br/>AMPA — <strong>Not Detected</strong><br/>Glufosinate — <strong>Not Detected</strong></h6><h6>MDL for all testing is 0.01 mg/kg</h6><h6></h6><h6>This means that none of these compounds were detectable at the laboratory’s sensitivity threshold.</h6><h6>We make these reports publicly available so customers can see the data for themselves.</h6>",
+            "link_label": "Download",
+            "link": "https://cdn.shopify.com/s/files/1/0814/9601/5123/files/SimpleLab_Report_FMY67B.pdf?v=1772901079"
+          }
+        },
+        "column_D9N6bP": {
+          "type": "column",
+          "settings": {
+            "title": "Kosher",
+            "text": "<h6>Boostcous is produced in accordance with kosher standards and is certified by The Kashruth Council of Canada (COR).</h6><h6>This certification verifies that our ingredients, production processes, and facility practices meet the requirements of kosher dietary laws.</h6><h6>Kosher certification is reviewed and maintained through ongoing oversight and compliance checks.</h6><h6>For full documentation and verification, you can download our current certificate below.</h6>",
+            "link_label": "Download",
+            "link": "https://cdn.shopify.com/s/files/1/0814/9601/5123/files/LOC_Kosher_Cert_05_Jan_2026_15-50-38.pdf?v=1773001337"
+          }
+        },
+        "column_RxTLLe": {
+          "type": "column",
+          "settings": {
+            "title": "Gluten Free",
+            "text": "<h6>Boostcous is made entirely from naturally gluten-free ingredients including chickpea, lentil, and pea flour.</h6><h6>Our raw materials and manufacturing facility is gluten-free certified and our finished products are certified through the <strong>Gluten-Free Certification Organization (GFCO)</strong>.</h6><h6>We have completed the certification process and are currently awaiting final approval and documentation. Once issued, our official gluten-free certification will be posted here.</h6>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_m34nJm": {
+          "type": "column",
+          "settings": {
+            "title": "Non-GMO Certified Ingredients",
+            "text": "<h6>Boostcous is made from three simple ingredients: chickpeas, yellow lentils, and yellow peas. All of these pulses are sourced from suppliers that provide <strong>Non-GMO Project certification and full traceability documentation</strong>.</h6><h6>Our ingredient partners verify that these crops are <strong>grown, handled, and processed without genetic modification</strong>, ensuring the integrity of our supply chain from farm to finished product.</h6><h6>We believe simple food should stay simple — real ingredients, responsibly sourced, and an ingredient label that you can recognize tot he everyday eater.</h6>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "column_rPeXhL",
+        "column_D9N6bP",
+        "column_RxTLLe",
+        "column_m34nJm"
+      ],
+      "disabled": true,
+      "name": "t:sections.multicolumn.presets.name",
+      "settings": {
+        "title": "",
+        "heading_size": "h1",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "button_label": "Shop Boostcous",
+        "button_link": "shopify://pages/boost-layout-home",
+        "columns_desktop": 3,
+        "column_alignment": "left",
+        "background_style": "primary",
+        "color_scheme": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "sc_blog_list_EeBc84": {
+      "type": "sc-blog-list",
+      "blocks": {
+        "link_howweeat": {
+          "type": "link",
+          "settings": {
+            "label": "How We Eat Boostcous",
+            "url": "shopify://pages/how-we-eat"
+          }
+        },
+        "blog_cbmKdN": {
+          "type": "blog",
+          "settings": {
+            "blog": "dinners"
+          }
+        },
+        "blog_AMpgfJ": {
+          "type": "blog",
+          "settings": {
+            "blog": "salads"
+          }
+        },
+        "blog_eNbB7T": {
+          "type": "blog",
+          "settings": {
+            "blog": "one-pan-dishes"
+          }
+        },
+        "blog_iWPVwC": {
+          "type": "blog",
+          "settings": {
+            "blog": "desserts"
+          }
+        }
+      },
+      "block_order": [
+        "link_howweeat",
+        "blog_cbmKdN",
+        "blog_AMpgfJ",
+        "blog_eNbB7T",
+        "blog_iWPVwC"
+      ],
+      "name": "Sc Blog List",
+      "settings": {
+        "link": "shopify://pages/recipes",
+        "title": "Explore"
+      }
+    },
+    "recipe_featured_blog_highlight_4GXcgj": {
+      "type": "recipe-featured-blog-highlight",
+      "blocks": {
+        "blog_post_EjDJ6V": {
+          "type": "blog_post",
+          "settings": {
+            "article": "dinners/crispy-buffalo-boostcous-bites-with-homemade-ranch"
+          }
+        },
+        "blog_post_wJkCA9": {
+          "type": "blog_post",
+          "settings": {
+            "article": "dinners/protein-couscous-risotto-with-chili-garlic-and-lemon"
+          }
+        }
+      },
+      "block_order": [
+        "blog_post_EjDJ6V",
+        "blog_post_wJkCA9"
+      ],
+      "name": "Featured Blog Category",
+      "settings": {
+        "bg_color": "#fbf5e6",
+        "image": "shopify://shop_images/boostcous-dinners-hero-dinner-refresh-v2-W63fNSZwE72rsJHfZTadhH_1.webp",
+        "title": "Dinners.",
+        "description": "<p>It begins with Boostcous, the fast protein couscous base that makes weeknight cooking feel brighter. Ready in 5 minutes and built to stand in for rice or pasta, it soaks up the flavors of the sauces, vegetables, and curries you layer on top.</p>",
+        "btn_text": "View all recipes",
+        "btn_link": "shopify://blogs/dinners",
+        "sidebar_label": "FEATURED DINNERS",
+        "sidebar_link_text": "Explore dinners",
+        "sidebar_link_url": ""
+      }
+    },
+    "community_recipe_promo_howweeat": {
+      "type": "community-recipe-promo",
+      "name": "Community Recipe Promo",
+      "settings": {
+        "bg_color": "#f7f4ec",
+        "label": "From the community",
+        "title": "How we eat Boostcous",
+        "description": "<p>Real bowls from our kitchen and our customers. Quick, simple, and built around whatever protein and greens you have on hand.</p>",
+        "btn_text": "See how we eat it",
+        "btn_link": "shopify://pages/how-we-eat",
+        "max_images": 7
+      }
+    },
+    "recipe_dual_category_cards_9GLRFW": {
+      "type": "recipe-dual-category-cards",
+      "blocks": {
+        "category_card_A7weNA": {
+          "type": "category_card",
+          "settings": {
+            "width": "half",
+            "bg_image": "shopify://shop_images/harvest-salad-editorial-v2_b67e34c3_2.png",
+            "title": "Salads",
+            "description": "Fresh herbs, crisp produce, and Boostcous turn salads into something more complete. This gluten-free couscous alternative cooks in 5 minutes, brings protein and fiber to the bowl, and adds the texture and staying power that keep every bite interesting.",
+            "boxTitle": "",
+            "featured_article": "salads/roasted-butternut-boostcous-salad",
+            "meta_label": "",
+            "btn_text": "See all salads",
+            "btn_link": "shopify://blogs/salads"
+          }
+        },
+        "category_card_6QDPzR": {
+          "type": "category_card",
+          "settings": {
+            "width": "half",
+            "bg_image": "shopify://shop_images/baked-chicken-editorial-v3_3a9a0e75_1.png",
+            "title": "One Pan Dishes",
+            "description": "Boostcous keeps one-pan cooking quick, colorful, and deeply comforting. It absorbs bold flavor fast, shortens the path from stovetop to table, and gives you an easier protein-packed alternative to the usual rice-and-pasta routine.",
+            "boxTitle": "",
+            "featured_article": "one-pan-dishes/one-pan-baked-chicken-boostcous-couscous",
+            "meta_label": "",
+            "btn_text": "See all one pan dishes",
+            "btn_link": "shopify://blogs/one-pan-dishes"
+          }
+        },
+        "category_card_JdWi7L": {
+          "type": "category_card",
+          "settings": {
+            "width": "full",
+            "bg_image": "shopify://shop_images/boostcous-pudding-editorial-v3_c5ad63f7_1.png",
+            "title": "Desserts",
+            "description": "Sweet recipes can start with Boostcous too. Its delicate texture brings a playful twist to fruit-forward finishes, creamy puddings, and spoonable desserts that feel comforting, unexpected, and easy to make your own.",
+            "boxTitle": "",
+            "featured_article": "desserts/boostcous-pudding-with-candied-almonds-and-raspberry-sauce",
+            "meta_label": "",
+            "btn_text": "See all desserts",
+            "btn_link": "shopify://blogs/desserts"
+          }
+        }
+      },
+      "block_order": [
+        "category_card_A7weNA",
+        "category_card_6QDPzR",
+        "category_card_JdWi7L"
+      ],
+      "name": "Dual Blog Category Cards",
+      "settings": {
+        "bg_color": "#fefdf8"
+      }
+    }
+  },
+  "order": [
+    "rich_text_XatVa9",
+    "main",
+    "multicolumn_aXtte7",
+    "sc_blog_list_EeBc84",
+    "recipe_featured_blog_highlight_4GXcgj",
+    "community_recipe_promo_howweeat",
+    "recipe_dual_category_cards_9GLRFW"
+  ]
+}

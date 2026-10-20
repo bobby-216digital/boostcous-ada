@@ -1,0 +1,625 @@
+{{ 'component-article-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-blog.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{% comment %} {%- paginate blog.articles by 6 -%}
+  <div class="main-blog page-width section-{{ section.id }}-padding">
+    <h1 class="title--primary{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+      {{ blog.title | escape }}
+    </h1>
+
+    <div class="blog-articles {% if section.settings.layout == 'collage' %}blog-articles--collage{% endif %}">
+      {%- for article in blog.articles -%}
+        <div
+          class="blog-articles__article article{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+          {% if settings.animations_reveal_on_scroll %}
+            data-cascade
+            style="--animation-order: {{ forloop.index }};"
+          {% endif %}
+        >
+          {%- render 'article-card',
+            article: article,
+            media_height: section.settings.image_height,
+            media_aspect_ratio: article.image.aspect_ratio,
+            show_image: section.settings.show_image,
+            show_date: section.settings.show_date,
+            show_author: section.settings.show_author,
+            show_excerpt: true
+          -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if paginate.pages > 1 -%}
+      {%- render 'pagination', paginate: paginate -%}
+    {%- endif -%}
+  </div>
+{%- endpaginate -%} {% endcomment %}
+
+{%- paginate blog.articles by 6 -%}
+<div class="bc-recipe-section section-{{ section.id }}-padding">
+  {% comment %} --- DYNAMIC CATEGORY TABS --- {% endcomment %}
+
+  {% comment %} <div class="bc-filter-tabs">
+    <div class="container">
+      <a href="{{ blog.url }}" class="bc-tab-item {% if current_tags == blank %}is-active{% endif %}">
+        {{blog.title }}
+      </a>
+      
+      {%- for tag in blog.all_tags -%}
+        <a href="{{ blog.url }}/tagged/{{ tag | handle }}" 
+          class="bc-tab-item {% if current_tags contains tag %}is-active{% endif %}">
+          {{ tag }}
+        </a>
+      {%- endfor -%}
+     </div>
+  </div> {% endcomment %}
+
+{% for block in section.blocks %}
+
+  {% assign blog_handle_text = block.settings.blog-title | handle %}
+  {% assign blog_handle = blog.title | handle %}
+
+  {% if blog_handle == blog_handle_text %}
+
+    <section class="custom-hero-block" style="background-image: url('{{ block.settings.recipe_image | image_url: width: 2000 }}');">
+      <div class="hero-overlay">
+        <div class="container">        
+          <div class="hero-content">
+
+            {% if block.settings.recipe_sub_title != blank %}
+              <div class="recipe_sub_title">
+                {{ block.settings.recipe_sub_title }}
+              </div>
+            {% endif %}
+
+            {% if block.settings.recipe_title != blank %}
+              <h1 class="hero-heading">
+                {{ block.settings.recipe_title }}
+              </h1>
+            {% endif %}
+
+            {% if block.settings.recipe_description != blank %}
+              <div class="hero-description">
+                {{ block.settings.recipe_description }}
+              </div>
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <div class="recipe-count-block">
+      <div class="container">
+         <div class="bottom-text-block">
+            {% if block.settings.recipe_bottom_text != blank %}
+              <div class="bottom-text"> {{ block.settings.recipe_bottom_text }} </div>
+            {% endif %}
+            <div class="article_count">
+                <span class="dots"></span>
+                <span>{{ blog.articles_count }} recipes </span>
+            </div>
+          </div>
+      </div>
+    </div>
+
+  {% endif %}
+
+{% endfor %}
+
+  <div class="bc-recipe-grid">
+    {%- for article in blog.articles -%}
+      <div class="bc-grid-item">
+        <div class="recipe-content">
+        <a href="{{ article.url }}" class="recipe-card-v2">
+          {%- if article.image -%}
+            <div class="recipe-card-v2__img-container">
+              <img
+                src="{{ article.image.src | image_url: width: 600 }}"
+                alt="{{ article.image.src.alt | escape }}"
+                class="recipe-card-v2__img"
+                loading="lazy"
+                width="600"
+                height="600"
+              >
+            </div>
+          {%- endif -%}
+          <div class="recipe-card-v2__content">
+            <div class="recipe-card-v2__tags">
+                <span class="recipe-card-v2__tag">{{ blog.title }}</span>
+            </div>
+
+            <div class="recipe-time-block">
+              {% assign recipes_detail = article.metafields.custom.recipes_details.value %}
+              {{ recipes_detail.cook_time }}
+              {{ recipes_detail.servings | default: '4' }}
+            </div>
+            
+            <h3 class="recipe-card-v2__title">
+              {{ article.title | escape }}
+            </h3>
+            {%- if section.settings.show_excerpt -%}
+              <p class="recipe-card-v2__excerpt">
+                {{ article.content | strip_html | truncatewords: 20 }}
+              </p>
+            {%- endif -%}
+              {% comment %} <div class="recipe-meta-text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>{{ article.published_at | date: "%b %d, %Y" }}</span>
+              </div> {% endcomment %}
+
+              <div class="recipe-meta-text recipe-read-more">
+                <span>View Recipe</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-4 w-4" data-loc="client/src/pages/Home.tsx:127"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+              </div>
+          </div>
+        </a>
+      </div>
+      </div>
+    {%- endfor -%}
+  </div>
+  {% if paginate.pages > 1 %}
+    <div class="bc-pagination">
+      {% render 'pagination', paginate: paginate %}
+    </div>
+  {% endif %}
+</div>
+
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "t:sections.main-blog.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show Excerpt",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:sections.main-blog.settings.layout.options__1.label"
+        },
+        {
+          "value": "collage",
+          "label": "t:sections.main-blog.settings.layout.options__2.label"
+        }
+      ],
+      "default": "collage",
+      "label": "t:sections.main-blog.settings.layout.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "default": true,
+      "label": "t:sections.main-blog.settings.show_image.label"
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.main-blog.settings.image_height.options__1.label"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.main-blog.settings.image_height.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.main-blog.settings.image_height.options__3.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.main-blog.settings.image_height.options__4.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.main-blog.settings.image_height.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "default": true,
+      "label": "t:sections.main-blog.settings.show_date.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "default": false,
+      "label": "t:sections.main-blog.settings.show_author.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "recipe",
+      "name": "Recipe Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "blog-title",
+          "label": "Blog Title"
+        },
+        {
+          "type": "image_picker",
+          "id": "recipe_image",
+          "label": "Recipe Image"
+        },
+        {
+          "type": "text",
+          "id": "recipe_sub_title",
+          "label": "Recipe Sub Title"
+        },
+        {
+          "type": "text",
+          "id": "recipe_title",
+          "label": "Recipe Title"
+        },
+        {
+          "type": "textarea",
+          "id": "recipe_description",
+          "label": "Recipe Description"
+        },
+        {
+          "type": "text",
+          "id": "recipe_bottom_text",
+          "label": "Recipe Bottom Text"
+        },
+      ]
+    }
+  ],
+}
+{% endschema %}
+
+
+
+<style>
+
+
+.custom-hero-block {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+}
+
+.hero-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #0c1e3ac2, #0c1e3a8f 42%, #0c1e3a29);
+}
+
+.hero-content {
+  max-width: 544px;
+  color: #fff;
+}
+
+.recipe_sub_title {
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  color: #f9f4e8f0;
+}
+
+.bc-recipe-section .container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 16px; 
+    width: 100%;
+}
+
+.hero-heading { 
+  font-size: 88px;
+  font-weight: 500;
+  line-height: 1;
+  color: #f9f4e8;
+  font-family: serif;
+  margin: 0; 
+  margin-bottom: 20px;
+}
+
+.hero-description {
+    font-size: 18px;
+    line-height: 1.8;
+    opacity: 1;
+    color: #f9f4e8f7;
+    font-weight: 500;
+    font-family: 'Inter';
+    letter-spacing: 0;
+}
+
+
+  .bc-recipe-section {
+    margin: 0 auto;
+  }
+  {% comment %} .bc-filter-tabs {
+    border-top: 1px solid #17305614;
+    border-bottom: 1px solid #17305614;
+  }
+  .bc-filter-tabs .container{
+    max-width: 1512px;
+    padding: 24px 20px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: left;
+    gap: 12px;
+    flex-wrap: wrap;
+  } {% endcomment %}
+  .bc-recipe-grid {
+    max-width: 1512px;
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+  .bc-recipe-section .bc-grid-item {
+    border-radius: 28px;
+    overflow: hidden; 
+    position: relative;
+  }
+  .bc-blog-title {
+    font-family: var(--bc-font-serif);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: var(--bc-primary-navy);
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: -0.02em;
+  }
+  .bc-tab-item {
+    color: #173056;
+    font-family: menca,"Inter",sans-serif;
+    text-decoration: none;
+    font-size: 17px;
+    line-height: 1;
+  }
+  .bc-tab-item.is-active {
+    border-bottom: 2.5px solid #173056;
+  }
+  /* RECIPE GRID */
+  .bc-recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding-top: 48px;
+    padding-bottom: 48px;    
+  }
+  /* RECIPE CARD */
+  .recipe-card-v2 {
+    background: #fff;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: transform 0.8s ease;
+  }
+  .recipe-card-v2:hover {
+    transform: translateY(-5px);
+  }
+  .recipe-card-v2__img-container {
+    padding-top: 100%; /* Square Ratio */
+    position: relative;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+  .recipe-card-v2__img {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+  .recipe-card-v2:hover .recipe-card-v2__img {
+    transform: scale(1.08);
+  }
+  .recipe-card-v2__content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  .recipe-card-v2__tags {
+    position: absolute;
+    top: 15px;
+  }
+  .recipe-card-v2__tag {
+    font-family: 'Inter';
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    background: #f6f0e1;
+    padding: 7px 12px;
+    border-radius: 4px;
+    letter-spacing: 0.18em;
+    color: #173056;
+    border-radius: 50px;
+  }
+  .recipe-card-v2__title {
+    font-size: 30px;
+    color: #173056;
+    margin: 0 0 12px 0;
+    line-height: 1;
+    transition: color 0.3s ease;
+    font-family: serif;
+    letter-spacing: -.05em;
+    font-weight: inherit;
+  }
+  .recipe-card-v2__excerpt {
+    color: #173056c2;
+    font-size: 14px;
+    margin: 0;
+    margin-bottom: 24px;
+    font-family: 'Inter';
+    letter-spacing: 0;
+  }
+
+  .recipe-meta-text {
+    font-family: var(--bc-font-sans);
+    font-size: 12px;
+    color: var(--bc-text-muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .recipe-read-more {
+    color: #235caf;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    font-family: 'Inter';
+    font-size: 14px;
+    gap: 4px;
+  }
+  .recipe-meta-text svg {
+    width: 16px;
+    height: 16px;
+  }
+  .bc-pagination {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+  }
+  .recipe-time-block {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #1730568f;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  .recipe-count-block {
+    background: #fff;
+  } 
+  .recipe-count-block .bottom-text-block {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+  }
+  .recipe-count-block .article_count .dots {
+    width: 10px;
+    height: 10px;
+    background: #235caf;
+    display: block;
+    border-radius: 50px;
+  }
+  .recipe-count-block .article_count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #173056;
+    font-family: 'Inter';
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .recipe-count-block .bottom-text {
+    letter-spacing: 3px;
+    color: #173056;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'Inter';
+  }
+
+
+  @media(max-width:1279px) { 
+    .bc-recipe-grid {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 960px;
+    }
+    .bc-recipe-section .container {
+      max-width: 960px;
+    }
+  }
+  @media(max-width:1023px) {
+    .bc-recipe-grid { 
+      max-width: 720px;
+    }
+    .bc-recipe-section .container {
+      max-width: 720px;
+    }
+    .hero-heading {
+      font-size: 72px;
+    }
+  }
+  @media(max-width:767px) { 
+     .bc-recipe-grid {
+        grid-template-columns: repeat(1, 1fr);
+     }
+     .hero-heading {
+      font-size: 54px;
+    }
+    .hero-description {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+  }
+    @media(max-width:600px) {  
+      .recipe-count-block .bottom-text-block {
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .recipe-count-block .bottom-text {
+        width: 100%;
+      }
+    }
+</style>

@@ -1,0 +1,169 @@
+{%- comment -%}
+  PATCHED: adds a "link" block type so the Explore row can point at pages
+  as well as blogs, and styles the section title as a label rather than a tab.
+{%- endcomment -%}
+
+{% assign blog = blank %}
+
+{% for block in section.blocks %}
+  {% if blog == blank %}
+    {% assign blog = block.settings.blog %}
+  {% endif %}
+{% endfor %}
+<div class="bc-filter-tabs">
+    <div class="container">
+      {% if section.settings.title != blank %}
+        <a href="{{ section.settings.link }}" class="bc-tab-title">
+            {{  section.settings.title  }}
+        </a>
+      {% endif %}
+
+      {% assign current_path = request.path | split: '/' | last %}
+
+{% for block in section.blocks %}
+  {% case block.type %}
+
+    {% when 'link' %}
+      {% assign link_handle = block.settings.url | split: '/' | last %}
+      <a href="{{ block.settings.url }}"
+         class="bc-tab-item {% if link_handle == current_path %}is-active{% endif %}"
+         {{ block.shopify_attributes }}>
+        {{ block.settings.label }}
+      </a>
+
+    {% else %}
+      {% assign blog = block.settings.blog %}
+      <a href="{{ blog.url }}"
+         class="bc-tab-item {% if blog.handle == current_path %}is-active{% endif %}"
+         {{ block.shopify_attributes }}>
+        {{ blog.title }}
+      </a>
+
+  {% endcase %}
+{% endfor %}
+
+     </div>
+  </div>
+
+<style>
+  .bc-filter-tabs {
+    border-top: 1px solid #17305614;
+    border-bottom: 1px solid #17305614;
+  }
+  .bc-filter-tabs .container{
+    max-width: 1512px;
+    padding: 24px 20px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 16px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bc-filter-tabs .container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bc-filter-tabs .bc-tab-title {
+    font-family: serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+    color: #173056;
+    text-decoration: none;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding-right: 20px;
+    margin-right: 4px;
+    border-right: 1px solid #17305626;
+  }
+
+  .bc-filter-tabs .bc-tab-item {
+    color: #173056b3;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-decoration: none;
+    font-size: 16px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .bc-filter-tabs .bc-tab-item:hover {
+    color: #173056;
+  }
+  .bc-filter-tabs .bc-tab-item.is-active {
+    color: #173056;
+    font-weight: 600;
+  }
+
+   @media(max-width:1279px) {
+    .bc-filter-tabs .container {
+      max-width: 960px;
+    }
+  }
+  @media(max-width:1023px) {
+    .bc-filter-tabs .container {
+      max-width: 720px;
+    }
+    .bc-filter-tabs .bc-tab-title {
+      font-size: 19px;
+      padding-right: 16px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Sc Blog List",
+  "settings": [
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Recipe Link"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Recipe Title"
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "blog",
+      "name": "blog",
+      "settings": [
+        {
+          "type": "blog",
+          "id": "blog",
+          "label": "Blog"
+        }
+      ]
+    },
+    {
+      "type": "link",
+      "name": "link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sc Blog List"
+    }
+  ]
+}
+{% endschema %}

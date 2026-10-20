@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Boostcous accessibility fixes (WCAG 2.1/2.2 AA) — Oct 2026
+   Loaded on every page by sections/a11y-fixes.liquid (header group).
+   Remove that section from sections/header-group.json to roll back.
+   ========================================================================== */
+
+/* 1. Visible keyboard focus (WCAG 2.4.7 / 2.4.11)
+   Theme default was a 50%-opacity outline that was hard to see on cream. */
+*:focus-visible,
+.focus-inset:focus-visible,
+.focus-offset:focus-visible,
+.button:focus-visible,
+.field__input:focus-visible,
+.select__select:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 0.3rem solid rgb(var(--color-foreground)) !important;
+  outline-offset: 0.3rem !important;
+  box-shadow: 0 0 0 0.6rem rgb(var(--color-background)) !important;
+}
+
+/* 2. Text contrast (WCAG 1.4.3) — keep brand colours, remove the faded
+   75%/70%/55% opacity the theme applies to secondary text, which dropped
+   brand blue on cream from 5.9:1 to ~3.6:1. */
+.caption,
+.caption-large,
+.caption-with-letter-spacing,
+.form__label,
+.product__text,
+.product__tax,
+.price,
+.price-item,
+.price__sale .price-item--regular,
+.unit-price,
+.facets__heading,
+.facets__summary-label,
+.facets__summary,
+.facet-filters__label,
+.facet-filters__sort,
+.product-count__text,
+.product-count,
+#ProductCountDesktop,
+#ProductCountMobile,
+.footer__localization h2,
+.footer-block__details-content .list-menu__item--link,
+.copyright__content,
+.copyright__content a,
+.policies a,
+.localization-form__select,
+.disclosure__button,
+.quantity__label,
+.cart-item__details > * + *,
+.cart-item__discounted-prices,
+.totals__total,
+.tax-note,
+.cart__note,
+.card-information,
+.card__information .caption-with-letter-spacing,
+.article-card__info,
+.rte blockquote,
+h6,
+.h6,
+#shopify-buyer-consent,
+#shopify-subscription-policy-button,
+.link--text:hover {
+  color: rgb(var(--color-foreground)) !important;
+}
+.light {
+  opacity: 1;
+}
+
+/* 3. Link + secondary-button colour on the cream scheme (WCAG 1.4.3)
+   Light cyan (#82e5fc) on cream was 1.3:1. Use brand blue (#235caf, 5.9:1). */
+.color-scheme-1,
+.color-scheme-1 .gradient {
+  --color-link: 35, 92, 175;
+  --color-secondary-button-text: 35, 92, 175;
+}
+.color-scheme-1 .share-button__button,
+.color-scheme-1 .product__tax a,
+.color-scheme-1 .rte a {
+  color: rgb(35, 92, 175) !important;
+}
+
+/* 4. Respect "reduce motion" (WCAG 2.2.2 / 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 5. Pause control for auto-scrolling marquees (WCAG 2.2.2) */
+.a11y-motion-toggle {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  padding: 0.6rem 1.2rem;
+  font: inherit;
+  font-size: 1.3rem;
+  border-radius: 2rem;
+  border: 0.2rem solid #235caf;
+  background: #ffffff;
+  color: #235caf;
+  cursor: pointer;
+}
+html.a11y-motion-paused *,
+html.a11y-motion-paused *::before,
+html.a11y-motion-paused *::after {
+  animation-play-state: paused !important;
+}
+
+/* Loader section has no visible content */
+.a11y-fixes-loader {
+  display: none;
+}

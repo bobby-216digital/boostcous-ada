@@ -1,0 +1,236 @@
+{%- comment -%}
+  Store Locator — Boostcous
+  Reads every ACTIVE entry of the `stockist` metaobject (Shopify admin > Content > Metaobjects > Store Locator - Stockist).
+  Draft entries are never returned to the storefront, so Draft/Active is the publish gate.
+  Stores whose Store type is "Online retailer" are excluded entirely: the order-direct block
+  below links to Boostcous.com only, never to third-party online sellers.
+  The map is progressive enhancement: if Leaflet does not load, the searchable list still works.
+{%- endcomment -%}
+
+{{ 'store-locator.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign per_page = 250
+  assign shelf_count = 0
+  assign soon_count = 0
+  assign online_count = 0
+  assign state_list = ''
+-%}
+
+<div
+  class="bc-loc"
+  id="bc-loc-{{ section.id }}"
+  style="--loc-bg: {{ section.settings.bg_color | default: '#fbf5e6' }};"
+  data-bc-locator
+  data-tile-url="{{ section.settings.tile_url | escape }}"
+  data-label-url="{{ section.settings.label_url | escape }}"
+  data-max-native-zoom="{{ section.settings.max_native_zoom | default: 16 }}"
+  data-tile-attribution="{{ section.settings.tile_attribution | escape }}"
+  data-contact-email="{{ section.settings.contact_email | escape }}"
+  data-shop-url="{{ section.settings.shop_url | default: '/collections/all' }}">
+  <div class="bc-loc__inner">
+    <header class="bc-loc__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="bc-loc__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h1 class="bc-loc__title">{{ section.settings.title }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <div class="bc-loc__intro">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </header>
+
+    {%- paginate shop.metaobjects.stockist.values by per_page -%}
+      {%- capture stores_json -%}
+        [
+        {%- assign first_row = true -%}
+        {%- for entry in shop.metaobjects.stockist.values -%}
+          {%- liquid
+            assign store_type = entry.store_type.value | default: 'Other'
+            assign state_code = entry.state.value | upcase | strip
+            if store_type == 'Online retailer'
+              assign online_count = online_count | plus: 1
+              continue
+            endif
+            if entry.availability.value == 'Coming soon'
+              assign soon_count = soon_count | plus: 1
+            else
+              assign shelf_count = shelf_count | plus: 1
+            endif
+            assign state_token = '|' | append: state_code | append: '|'
+            unless state_list contains state_token
+              assign state_list = state_list | append: state_token
+            endunless
+          -%}
+          {%- unless first_row %},{% endunless -%}
+          {%- assign first_row = false -%}
+          {
+          "id": {{ entry.system.handle | json }},
+          "name": {{ entry.store_name.value | json }},
+          "chain": {{ entry.chain.value | json }},
+          "street": {{ entry.street.value | json }},
+          "street2": {{ entry.street_2.value | json }},
+          "city": {{ entry.city.value | json }},
+          "state": {{ state_code | json }},
+          "zip": {{ entry.zip.value | json }},
+          "lat": {{ entry.latitude.value | json }},
+          "lng": {{ entry.longitude.value | json }},
+          "phone": {{ entry.phone.value | json }},
+          "website": {{ entry.website.value | json }},
+          "type": {{ store_type | json }},
+          "soon": {% if entry.availability.value == 'Coming soon' %}true{% else %}false{% endif %},
+          "from": {{ entry.available_from.value | json }},
+          "products": {{ entry.products.value | json }},
+          "notes": {{ entry.notes.value | json }}
+          }
+        {%- endfor -%}
+        ]
+      {%- endcapture -%}
+
+      {%- liquid
+        assign state_count = 0
+        if state_list != ''
+          assign state_count = state_list | split: '||' | size
+        endif
+      -%}
+
+      <ul class="bc-loc__stats">
+        <li class="bc-loc__stat"><b>{{ shelf_count }}</b>&nbsp;{{ shelf_count | pluralize: 'store', 'stores' }} on shelves</li>
+        {%- if soon_count > 0 -%}
+          <li class="bc-loc__stat"><b>{{ soon_count }}</b>&nbsp;coming soon</li>
+        {%- endif -%}
+        <li class="bc-loc__stat"><b>{{ state_count }}</b>&nbsp;{{ state_count | pluralize: 'state', 'states' }}</li>
+      </ul>
+
+      <div class="bc-loc__panel">
+        <div class="bc-loc__side">
+          <div class="bc-loc__search">
+            <form class="bc-loc__form" data-loc-form role="search">
+              <div class="bc-loc__field">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                  <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.6"></circle>
+                  <path d="M13.5 13.5 17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                </svg>
+                <label class="bc-loc__sr" for="bc-loc-input-{{ section.id }}">{{ section.settings.search_label }}</label>
+                <input
+                  class="bc-loc__input"
+                  id="bc-loc-input-{{ section.id }}"
+                  type="search"
+                  name="q"
+                  autocomplete="postal-code"
+                  placeholder="{{ section.settings.search_placeholder | escape }}"
+                  data-loc-input>
+              </div>
+              <button class="bc-loc__submit" type="submit">Search</button>
+            </form>
+            <div class="bc-loc__tools">
+              <button class="bc-loc__linkbtn" type="button" data-loc-geo>
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" focusable="false">
+                  <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                Use my location
+              </button>
+              <button class="bc-loc__linkbtn" type="button" data-loc-reset hidden>Clear search</button>
+            </div>
+          </div>
+
+          <div class="bc-loc__chips" role="group" aria-label="Filter by store type" data-loc-chips></div>
+
+          <div class="bc-loc__meta">
+            <span class="bc-loc__count" data-loc-count aria-live="polite"></span>
+            <span data-loc-origin></span>
+          </div>
+
+          <ul class="bc-loc__list" data-loc-list></ul>
+        </div>
+
+        <div class="bc-loc__map">
+          <p class="bc-loc__mapnote" data-loc-mapnote>Loading map&hellip;</p>
+          <div class="bc-loc__canvas" data-loc-canvas role="application" aria-label="Map of stores that carry Boostcous"></div>
+        </div>
+      </div>
+
+      {%- if section.settings.tile_attribution != blank -%}
+        <p class="bc-loc__mapcredit">{{ section.settings.tile_attribution }}</p>
+      {%- endif -%}
+
+      <script type="application/json" data-loc-data>{{ stores_json }}</script>
+
+      {%- if paginate.pages > 1 -%}
+        <p class="bc-loc__updated">Showing the first {{ per_page }} of {{ paginate.items }} locations.</p>
+      {%- endif -%}
+
+      {%- if section.settings.online_title != blank -%}
+        <section class="bc-loc__online">
+          <h2 class="bc-loc__subtitle">{{ section.settings.online_title }}</h2>
+          {%- if section.settings.online_copy != blank -%}
+            <p class="bc-loc__subcopy">{{ section.settings.online_copy }}</p>
+          {%- endif -%}
+          <ul class="bc-loc__onlinegrid">
+            <li class="bc-loc__onlinecard">
+              <div>
+                <p class="bc-loc__name">Boostcous.com</p>
+                <p class="bc-loc__addr">Shipped straight from us.</p>
+              </div>
+              <div class="bc-loc__actions">
+                <a class="bc-loc__btn" href="{{ section.settings.shop_url | default: '/collections/all' }}">Shop Boostcous</a>
+              </div>
+            </li>
+          </ul>
+        </section>
+      {%- endif -%}
+    {%- endpaginate -%}
+
+    {%- if section.settings.cta_title != blank -%}
+      <section class="bc-loc__cta">
+        <div class="bc-loc__cta-copy">
+          <h2>{{ section.settings.cta_title }}</h2>
+          {%- if section.settings.cta_copy != blank -%}<p>{{ section.settings.cta_copy }}</p>{%- endif -%}
+        </div>
+        <div class="bc-loc__cta-actions">
+          {%- if section.settings.cta_button_label != blank -%}
+            <a class="bc-loc__btn" href="{{ section.settings.cta_button_url }}">{{ section.settings.cta_button_label }}</a>
+          {%- endif -%}
+          {%- if section.settings.cta_button_2_label != blank -%}
+            <a class="bc-loc__btn bc-loc__btn--light" href="{{ section.settings.cta_button_2_url }}">{{ section.settings.cta_button_2_label }}</a>
+          {%- endif -%}
+        </div>
+      </section>
+    {%- endif -%}
+  </div>
+</div>
+
+<script src="{{ 'store-locator.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Store Locator",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#fbf5e6" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "STORE LOCATOR" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Find Boostcous near you" },
+    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>Boostcous is on shelves at independent grocers, natural food stores and cafes across the country. Search by ZIP code or city to find the closest one.</p>" },
+    { "type": "header", "content": "Search" },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "ZIP code, city, or state" },
+    { "type": "text", "id": "search_label", "label": "Search label (screen readers)", "default": "Search by ZIP code, city, or state" },
+    { "type": "header", "content": "Order direct" },
+    { "type": "text", "id": "online_title", "label": "Heading", "default": "Prefer to order online?" },
+    { "type": "text", "id": "online_copy", "label": "Copy", "default": "Order straight from us and we will ship it anywhere in the US.", "info": "This block links to the Boostcous store only. Third-party online retailers are deliberately not listed." },
+    { "type": "url", "id": "shop_url", "label": "Shop link" },
+    { "type": "header", "content": "Bottom call to action" },
+    { "type": "text", "id": "cta_title", "label": "Heading", "default": "Not in a store near you yet?" },
+    { "type": "text", "id": "cta_copy", "label": "Copy", "default": "Tell us where you shop and we will do the asking. Buyers and retailers can reach our wholesale team the same way." },
+    { "type": "text", "id": "cta_button_label", "label": "Button label", "default": "Request Boostcous at my store" },
+    { "type": "url", "id": "cta_button_url", "label": "Button link" },
+    { "type": "text", "id": "cta_button_2_label", "label": "Second button label", "default": "Wholesale enquiries" },
+    { "type": "url", "id": "cta_button_2_url", "label": "Second button link" },
+    { "type": "header", "content": "Map" },
+    { "type": "text", "id": "tile_url", "label": "Map tile URL", "default": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", "info": "Esri Light Gray needs no API key. Note the {z}/{y}/{x} order. Swap for a keyed provider such as MapTiler or Mapbox if traffic grows." },
+    { "type": "text", "id": "label_url", "label": "Map label overlay URL", "default": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", "info": "Optional transparent layer that draws place names on top of the base map. Leave blank for an unlabelled map." },
+    { "type": "text", "id": "max_native_zoom", "label": "Max native tile zoom", "default": "16", "info": "Highest zoom the tile provider actually has. Leaflet upscales beyond this instead of requesting blank tiles. Esri Light Gray is 16." },
+    { "type": "text", "id": "tile_attribution", "label": "Map attribution", "default": "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ", "info": "Shown as a small line under the map instead of on top of it. Esri requires this credit, so do not clear it while using Esri tiles." },
+    { "type": "text", "id": "contact_email", "label": "Contact email", "default": "hey@boostcous.com" }
+  ],
+  "presets": [{ "name": "Store Locator" }]
+}
+{% endschema %}

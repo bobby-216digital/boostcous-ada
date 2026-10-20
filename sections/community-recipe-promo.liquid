@@ -1,0 +1,219 @@
+{%- comment -%}
+  Community Recipe Promo
+  A single card promoting the How We Eat Boostcous page, with a collage built
+  automatically from the photos on published community_recipe entries.
+  The collage always fills its box: the first photo is a 2x2 hero, and any
+  photos left over on the last row are widened so no empty cells remain.
+{%- endcomment -%}
+
+{%- liquid
+  assign entries = shop.metaobjects.community_recipe.values
+  assign max_images = section.settings.max_images | default: 9
+
+  assign n = 0
+  for entry in entries
+    if entry.photo.value != blank and n < max_images
+      assign n = n | plus: 1
+    endif
+  endfor
+  assign smalls = n | minus: 1
+
+  comment
+    Desktop: 4 columns, hero spans cols 1-2 / rows 1-2, 4 small photos fill cols 3-4.
+  endcomment
+  assign d_rows = 2
+  assign d_k = 0
+  if smalls < 4
+    assign d_k = smalls
+  else
+    assign extra = smalls | minus: 4
+    assign d_k = extra | modulo: 4
+    assign d_extra_rows = extra | plus: 3 | divided_by: 4
+    assign d_rows = 2 | plus: d_extra_rows
+  endif
+  assign d_start = smalls | minus: d_k | plus: 1
+
+  comment
+    Mobile: 3 columns, hero spans cols 1-2 / rows 1-2, 2 small photos fill col 3.
+  endcomment
+  assign m_rows = 2
+  assign m_k = 0
+  if smalls > 2
+    assign extra_m = smalls | minus: 2
+    assign m_k = extra_m | modulo: 3
+    assign m_extra_rows = extra_m | plus: 2 | divided_by: 3
+    assign m_rows = 2 | plus: m_extra_rows
+  endif
+  assign m_start = smalls | minus: m_k | plus: 1
+-%}
+
+<style>
+  .bc-promo {
+    background-color: {{ section.settings.bg_color | default: '#f7f4ec' }};
+    padding: 40px 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  .bc-promo__inner {
+    max-width: 1472px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 34px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 1024px) {
+    .bc-promo__inner { grid-template-columns: 0.85fr 1.15fr; }
+  }
+
+  .bc-promo__text {
+    padding: 44px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .bc-promo__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2.4px;
+    color: #17305694;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .bc-promo__title {
+    font-family: serif;
+    font-size: 54px;
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -1.2px;
+    color: #173056;
+    margin: 0 0 18px;
+  }
+  .bc-promo__desc { font-size: 17px; line-height: 1.7; color: #173056cc; margin-bottom: 28px; }
+  .bc-promo__desc > *:last-child { margin-bottom: 0; }
+  .bc-promo__btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #173056;
+    color: #ffffff;
+    padding: 13px 22px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .bc-promo__btn:focus-visible { outline: 2px solid #235caf; outline-offset: 3px; }
+
+  .bc-promo__collage {
+    --bc-rows: {{ d_rows }};
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--bc-rows), minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    aspect-ratio: 4 / var(--bc-rows);
+    align-self: stretch;
+    gap: 4px;
+    padding: 4px;
+  }
+  .bc-promo__cell { position: relative; overflow: hidden; background: #f7f4ec; min-height: 0; }
+  .bc-promo__cell:first-child { grid-column: span 2; grid-row: span 2; }
+  .bc-promo__cell img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bc-promo__cell--d2 { grid-column: span 2; }
+  .bc-promo__cell--d4 { grid-column: span 4; }
+  .bc-promo__cell--dtall { grid-row: span 2; }
+
+  @media (max-width: 1023px) {
+    .bc-promo__inner { max-width: 720px; }
+    .bc-promo__text { padding: 32px 24px; }
+    .bc-promo__title { font-size: 42px; }
+  }
+  @media (max-width: 639px) {
+    .bc-promo { padding: 24px 16px; }
+    .bc-promo__title { font-size: 34px; }
+    .bc-promo__collage { --bc-rows: {{ m_rows }}; grid-template-columns: repeat(3, minmax(0, 1fr)); aspect-ratio: 3 / var(--bc-rows); }
+    .bc-promo__cell--d2, .bc-promo__cell--d4 { grid-column: auto; }
+    .bc-promo__cell--dtall { grid-row: auto; }
+    .bc-promo__cell--m2 { grid-column: span 2; }
+    .bc-promo__cell--m3 { grid-column: span 3; }
+    .bc-promo__cell--mtall { grid-row: span 2; }
+  }
+</style>
+
+<div class="bc-promo">
+  <div class="bc-promo__inner">
+    <div class="bc-promo__text">
+      {%- if section.settings.label != blank -%}
+        <div class="bc-promo__label">{{ section.settings.label }}</div>
+      {%- endif -%}
+      <h2 class="bc-promo__title">{{ section.settings.title | default: 'How we eat Boostcous' }}</h2>
+      {%- if section.settings.description != blank -%}
+        <div class="bc-promo__desc">{{ section.settings.description }}</div>
+      {%- endif -%}
+      {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+        <a class="bc-promo__btn" href="{{ section.settings.btn_link }}">
+          {{ section.settings.btn_text }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="bc-promo__collage">
+      {%- assign shown = 0 -%}
+      {%- for entry in entries -%}
+        {%- if entry.photo.value != blank and shown < max_images -%}
+          {%- liquid
+            assign cell_class = ''
+            if shown > 0
+              assign i = shown
+              if smalls == 1
+                assign cell_class = cell_class | append: ' bc-promo__cell--d2 bc-promo__cell--dtall bc-promo__cell--mtall'
+              else
+                if d_k > 0 and i >= d_start
+                  assign p = i | minus: d_start
+                  if d_k == 1
+                    assign cell_class = cell_class | append: ' bc-promo__cell--d4'
+                  elsif d_k == 2
+                    assign cell_class = cell_class | append: ' bc-promo__cell--d2'
+                  elsif p == 0
+                    assign cell_class = cell_class | append: ' bc-promo__cell--d2'
+                  endif
+                endif
+                if m_k > 0 and i >= m_start
+                  assign pm = i | minus: m_start
+                  if m_k == 1
+                    assign cell_class = cell_class | append: ' bc-promo__cell--m3'
+                  elsif pm == 0
+                    assign cell_class = cell_class | append: ' bc-promo__cell--m2'
+                  endif
+                endif
+              endif
+            endif
+          -%}
+          <div class="bc-promo__cell{{ cell_class }}">
+            <img src="{{ entry.photo.value | image_url: width: 600 }}" alt="{{ entry.title.value | escape }}" loading="lazy">
+          </div>
+          {%- assign shown = shown | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Community Recipe Promo",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#f7f4ec" },
+    { "type": "text", "id": "label", "label": "Eyebrow label", "default": "From the community" },
+    { "type": "text", "id": "title", "label": "Title", "default": "How we eat Boostcous" },
+    { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Real bowls from our kitchen and our customers. Quick, simple, and built around whatever protein and greens you have on hand.</p>" },
+    { "type": "text", "id": "btn_text", "label": "Button text", "default": "See how we eat it" },
+    { "type": "url", "id": "btn_link", "label": "Button link" },
+    { "type": "range", "id": "max_images", "label": "Images in collage", "min": 3, "max": 9, "step": 1, "default": 9 }
+  ],
+  "presets": [{ "name": "Community Recipe Promo" }]
+}
+{% endschema %}
