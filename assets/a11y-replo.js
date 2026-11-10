@@ -126,6 +126,18 @@
     document.querySelectorAll('[role="listbox"]').forEach(function (lb) {
       if (!lb.querySelector('[role="option"]')) lb.setAttribute('role', 'group');
     });
+
+    // 8. Slider thumbnails repeated from one Replo element all carry the first
+    //    one's label ("Go to slide 1"). Number them by position.
+    document.querySelectorAll('[data-rid][aria-label^="Go to slide"]').forEach(function (el) {
+      var rid = el.getAttribute('data-rid');
+      var items = Array.prototype.filter.call(el.parentElement.children, function (c) {
+        return c.getAttribute('data-rid') === rid;
+      });
+      if (items.length < 2) return;
+      var label = 'Go to slide ' + (items.indexOf(el) + 1);
+      if (el.getAttribute('aria-label') !== label) el.setAttribute('aria-label', label);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fix);
