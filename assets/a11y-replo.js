@@ -1,5 +1,6 @@
 /* Boostcous accessibility fixes for Replo + app content — Oct 2026.
-   Fills gaps Replo's editor can't set. Only adds missing attributes. */
+   Fills gaps Replo's editor can't set, and removes ARIA that Replo/apps
+   apply in invalid places. */
 (function () {
   function hasName(el) {
     return !!((el.getAttribute('aria-label') || '').trim() || el.getAttribute('aria-labelledby'));
@@ -16,6 +17,13 @@
       lb.setAttribute('aria-label', label);
     });
 
+    // 1b. A plain div/span can't carry a name; once the list inside it is
+    //     named, drop the wrapper's copy.
+    document.querySelectorAll('div[aria-label]:not([role]), span[aria-label]:not([role])').forEach(function (wrap) {
+      var lb = wrap.querySelector('[role="listbox"]');
+      if (lb && lb.getAttribute('aria-label') === wrap.getAttribute('aria-label')) wrap.removeAttribute('aria-label');
+    });
+
     // 2. Copies of the same image (carousel clones, mobile/desktop versions):
     //    mirror the alt / label / decorative setting from the edited original.
     var key = function (img) { return ((img.getAttribute('src') || '').split('?')[0].split('/').pop()); };
@@ -23,7 +31,7 @@
     document.querySelectorAll('img').forEach(function (img) {
       var src = key(img);
       if (!src) return;
-      if (img.getAttribute('aria-label') || (img.getAttribute('alt') || '').trim() || img.getAttribute('role') === 'presentation') {
+      if (img.getAttribute('aria-label') || img.hasAttribute('alt')) {
         if (!bySrc[src]) bySrc[src] = img;
       }
     });
@@ -32,11 +40,15 @@
       if (!ref) return;
       if (ref.getAttribute('aria-label')) img.setAttribute('aria-label', ref.getAttribute('aria-label'));
       else if ((ref.getAttribute('alt') || '').trim()) img.setAttribute('alt', ref.getAttribute('alt'));
-      else { img.setAttribute('alt', ''); img.setAttribute('role', 'presentation'); }
+      else img.setAttribute('alt', '');
     });
 
     // 2b. Specific images with no description in Replo (by image file).
-    var named = { '2d5289ee-79e6-463f-a0c9-0f7f7a2fdb0d': 'Red lentils' };
+    var named = {
+      '2d5289ee-79e6-463f-a0c9-0f7f7a2fdb0d': 'Red lentils',
+      'c25ea804-cc35-49f8-a021-9c7792431e53': '18g of protein',
+      '6c96cae9-7f6e-40c0-965d-b81af6214027': '11g of fiber'
+    };
     document.querySelectorAll('img:not([alt]):not([aria-label])').forEach(function (img) {
       if (named[key(img)]) img.setAttribute('alt', named[key(img)]);
     });
@@ -72,6 +84,60 @@
       seen[l] = (seen[l] || 0) + 1;
       if (seen[l] > 1) r.setAttribute('aria-label', l + ' ' + seen[l]);
     });
+
+    // 5. Decorative images: alt="" already hides them, a role on top is invalid.
+    document.querySelectorAll('img[alt=""][role="presentation"], img[alt=""][role="none"]').forEach(function (img) {
+      img.removeAttribute('role');
+    });
+
+    // 5b. Popup images left with the placeholder alt "Image" are decorative
+    //     (the popup's text carries the message).
+    document.querySelectorAll('[id^="alia-root"] img[alt="Image"]').forEach(function (img) {
+      img.setAttribute('alt', '');
+    });
+
+    // 6. Judge.me star badge placed inside a link or clickable card: its stars
+    //    are a separate button, which can't be nested. Keep them as an image
+    //    of the rating; the outer control still opens the reviews.
+    document.querySelectorAll('.jdgm-prev-badge__stars[role="button"]').forEach(function (stars) {
+      var host = stars.parentElement && stars.parentElement.closest('a[href], button, [role="button"], [role="link"]');
+      if (!host) return;
+      var scored = stars.closest('[data-score]');
+      stars.removeAttribute('tabindex');
+      stars.setAttribute('role', 'img');
+      if (scored) stars.setAttribute('aria-label', scored.getAttribute('data-score') + ' out of 5 stars');
+    });
+
+    // 7. Cards set up as a button/option that also contain their own buttons or
+    //    options: the inner controls get hidden from screen readers. Make the
+    //    card a named group instead; clicking it still works the same.
+    var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    document.querySelectorAll('[data-rid][role="button"], [data-rid][role="option"]').forEach(function (card) {
+      if (!card.querySelector(FOCUSABLE)) return;
+      var title = (card.innerText || '').trim().split('\n')[0].trim();
+      card.setAttribute('role', 'group');
+      card.removeAttribute('tabindex');
+      card.removeAttribute('aria-selected');
+      if (title && !hasName(card)) card.setAttribute('aria-label', title);
+    });
+    document.querySelectorAll('[data-rid][role="group"][aria-selected]').forEach(function (card) {
+      card.removeAttribute('aria-selected');
+    });
+    document.querySelectorAll('[role="listbox"]').forEach(function (lb) {
+      if (!lb.querySelector('[role="option"]')) lb.setAttribute('role', 'group');
+    });
+
+    // 8. Slider thumbnails repeated from one Replo element all carry the first
+    //    one's label ("Go to slide 1"). Number them by position.
+    document.querySelectorAll('[data-rid][aria-label^="Go to slide"]').forEach(function (el) {
+      var rid = el.getAttribute('data-rid');
+      var items = Array.prototype.filter.call(el.parentElement.children, function (c) {
+        return c.getAttribute('data-rid') === rid;
+      });
+      if (items.length < 2) return;
+      var label = 'Go to slide ' + (items.indexOf(el) + 1);
+      if (el.getAttribute('aria-label') !== label) el.setAttribute('aria-label', label);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fix);
@@ -79,5 +145,5 @@
   window.addEventListener('load', fix);
   var t;
   new MutationObserver(function () { clearTimeout(t); t = setTimeout(fix, 600); })
-    .observe(document.documentElement, { childList: true, subtree: true });
+    .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-selected'] });
 })();
